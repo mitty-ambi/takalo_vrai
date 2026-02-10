@@ -23,8 +23,9 @@ class Categorie
         $sql->bindValue(1, $this->id_categorie, \PDO::PARAM_INT);
         $sql->execute();
     }
-    public function verify(){
-        
+    public function verify()
+    {
+
     }
     // public function getAll()
     // {
