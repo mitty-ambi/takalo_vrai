@@ -88,4 +88,10 @@ $router->group('', function (Router $router) use ($app) {
             $app->render('login', ['error' => "Email ou mot de passe incorrect"]);
         }
     });
+    $router->post('/addCat', function () use ($app) {
+        $nom_cat = $_POST['cat'];
+        $cat = new Categorie(null, $nom_cat);
+        $cat->insert();
+    });
+
 }, [SecurityHeadersMiddleware::class]);

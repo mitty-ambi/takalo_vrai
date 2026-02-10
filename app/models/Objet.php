@@ -1,6 +1,4 @@
 <?php
-
-use app\models\Connection;
 class Objet
 {
     public $id;

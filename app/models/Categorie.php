@@ -12,9 +12,9 @@ class Categorie
     public function insert()
     {
         $DBH = \Flight::db();
-        $stmt = $DBH->prepare("INSERT INTO Categorie (nom_categorie) VALUES (:nom_categorie)");
-        $stmt->bindParam(':nom_categorie', $this->nom_categorie);
-        return $stmt->execute();
+        $sql = $DBH->prepare("INSERT INTO Categorie (nom_categorie) VALUES (?)");
+        $sql->bindValue(1, $this->nom_categorie, \PDO::PARAM_INT);
+        $sql->execute();
     }
     public function delete_cat()
     {
@@ -23,9 +23,12 @@ class Categorie
         $sql->bindValue(1, $this->id_categorie, \PDO::PARAM_INT);
         $sql->execute();
     }
-    public function getAll()
-    {
+    public function verify(){
         
     }
+    // public function getAll()
+    // {
+
+    // }
 }
 ?>
