@@ -14,8 +14,10 @@ CREATE TABLE Utilisateur(
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     mdp_hash VARCHAR(255) NOT NULL,
-    type_user VARCHAR(20) DEFAULT 'normal'
+    type_user VARCHAR(20) DEFAULT 'normal',
+    date_creation DATE
 );
+ALTER TABLE Utilisateur ADD date_creation DATE;
 
 CREATE TABLE Objet(
     id_objet INT PRIMARY KEY AUTO_INCREMENT,

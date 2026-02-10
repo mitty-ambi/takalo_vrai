@@ -1,3 +1,9 @@
+<?php
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -9,9 +15,20 @@
     <link rel="stylesheet" href="/assets/css/auth.css">
     <link rel="stylesheet" href="/assets/css/sidebar.css">
 </head>
-<?php include("components/side_nav.php") ?>
+<?php include __DIR__ . '/components/side_nav.php'; ?>
 
 <body class="register-bg">
+    <?php
+    echo "<div style='position:fixed; top:10px; right:10px; background:#fff; padding:10px; border-radius:5px; z-index:9999;'>";
+    echo "Session ID: " . ($_SESSION["id_user"] ?? 'NON DÉFINI');
+    echo "</div>";
+
+    if (isset($error_login)) {
+        echo "<div style='position:fixed; top:50px; right:10px; background:#f8d7da; padding:10px; border-radius:5px; z-index:9999;'>";
+        echo "Erreur: " . htmlspecialchars($error_login);
+        echo "</div>";
+    }
+    ?>
     <main class="auth-main">
         <div class="auth-content">
             <div class="auth-card">

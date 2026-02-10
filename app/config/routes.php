@@ -34,7 +34,6 @@ $router->group('', function (Router $router) use ($app) {
         $app->render('components/EditCat', ['category' => $category]);
     });
 
-    // POST handler for EditCat: update name and redirect to AdminCat
     $router->post('/EditCat', function () use ($app) {
         $id = $_POST['id'] ?? null;
         $nom = $_POST['nom'] ?? null;
@@ -85,7 +84,10 @@ $router->group('', function (Router $router) use ($app) {
         $nom = $_POST['nom'] ?? '';
         $prenom = $_POST['prenom'] ?? '';
         $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
+        if (User::emailExists($email)) {
+            $app->render('register', ['error_login' => 'email existe déjà']);
+        }
+        $password = $_POST['password'] ?? ''; 
         $type_user = $_POST['type_user'] ?? 'normal';
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -108,9 +110,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/login', function () use ($app) {
         $email = $_POST['email'];
         $password = $_POST['password'];
-
         $user = new User(null, null, $email, $password, null);
-
         $user_id = $user->login();
         if ($user_id) {
             $_SESSION["id_user"] = $user_id;
