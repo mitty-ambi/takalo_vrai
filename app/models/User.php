@@ -58,6 +58,7 @@ class User
         $sql = $DBH->prepare("SELECT * FROM Utilisateur WHERE id_user = ?");
         $sql->execute([$id_user]);
         return $sql->fetch(\PDO::FETCH_ASSOC);
+    }
     public static function type($id_user)
     {
         $DBH = \Flight::db();
