@@ -3,8 +3,8 @@ use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
 use app\models\User;
-
-
+use app\models\Objet;
+use app\models\Image_objet;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -57,9 +57,31 @@ $router->group('', function (Router $router) use ($app) {
         $user_id = $user->login();
         if ($user_id) {
             $_SESSION["id_user"] = $user_id;
+            $user_data = $user->get_user_by_id($user_id);
+            $_SESSION["user_data"] = $user_data;
             $app->redirect('/dashboard');
         } else {
             $app->render('login', ['error' => "Email ou mot de passe incorrect"]);
+        }
+    });
+    $router->get('/dashboard', function () use ($app) {
+        if (isset($_SESSION['id_user'])) {
+            $user_data = $_SESSION['user_data'] ?? [];
+            $objets = Objet::get_objet_by_id_user($_SESSION['id_user']);
+            $image_objet = new Image_objet();
+            $images_par_objet = [];
+            foreach ($objets as &$objet) {
+                $images = $image_objet->get_image_by_objet($objet['id']);
+                
+                if ($images) {
+                    $images_par_objet[$objet['id']] = $images;
+                } else {
+                    $images_par_objet[$objet['id']] = [];
+                }
+            }
+            $app->render('accueil', ['user_data' => $user_data, 'objets' => $objets, 'images_par_objet' => $images_par_objet]);
+        } else {
+            $app->redirect('/login');
         }
     });
 }, [SecurityHeadersMiddleware::class]);
