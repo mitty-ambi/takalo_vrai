@@ -4,6 +4,7 @@ use flight\Engine;
 use flight\net\Router;
 use app\models\User;
 
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -47,4 +48,18 @@ $router->group('', function (Router $router) use ($app) {
         $app->render('login', ['connected' => '1']);
     });
 
+    $router->post('/login', function () use ($app) {
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        $user = new User(null, null, $email, $password, null);
+
+        $user_id = $user->login();
+        if ($user_id) {
+            $_SESSION["id_user"] = $user_id;
+            $app->redirect('/dashboard');
+        } else {
+            $app->render('login', ['error' => "Email ou mot de passe incorrect"]);
+        }
+    });
 }, [SecurityHeadersMiddleware::class]);
