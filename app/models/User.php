@@ -48,7 +48,6 @@ class User
         if ($user && password_verify($this->mdp_hash, $user['mdp_hash'])) {
             return $user['id_user'];
         }
-
         return false;
     }
 }
