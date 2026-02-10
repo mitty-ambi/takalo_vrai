@@ -72,7 +72,14 @@ class Objet{
     }
     public function get_objets_autre_user($id_user){
         $DBH = Connection::dbconnect();
-        $query = "SELECT * FROM ";
+        $query = "SELECT * FROM Objet WHERE id_user != :id_user";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindParam(':id_user', $id_user);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }else{
+            return false;
+        }
     }
 }
 ?>
