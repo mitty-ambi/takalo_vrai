@@ -23,11 +23,12 @@ use app\models\User;
         <nav class="auth-nav">
             <ul>
                 <li class="mb-2"><a href="/dashboard" class="auth-link">Accueil</a></li>
-                <li class="mb-2"><a href="/register" class="auth-link">S'inscrire</a></li>
-                <li class="mb-2"><a href="/login" class="auth-link active">Se connecter</a></li>
                 <?php if (isset($_SESSION['id_user']) && User::adminOrNot($_SESSION['id_user'])) { ?>
                     <li class="mt-2"><a href="/AdminCat" class="auth-link">Catégorie</a></li>
+                    <li class="mt-2"><a href="/AdminCat" class="auth-link">Statistiques</a></li>
                 <?php } ?>
+                <li class="mb-2"><a href="/register" class="auth-link">S'inscrire</a></li>
+                <li class="mb-2"><a href="/login" class="auth-link active">Se connecter</a></li>
                 <li class="mb-2"><a href="/help" class="auth-link">Aide & support</a></li>
             </ul>
         </nav>

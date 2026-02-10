@@ -38,7 +38,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/EditCat', function () use ($app) {
         $id = $_POST['id'] ?? null;
         $nom = $_POST['nom'] ?? null;
-        if ($id && $nom !== null) { 
+        if ($id && $nom !== null) {
             $cat = new Categorie($id, $nom);
             try {
                 $cat->update();
