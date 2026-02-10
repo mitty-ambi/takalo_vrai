@@ -1,0 +1,6 @@
+/* Simple admin login styles */
+body.login-bg { background: linear-gradient(135deg,#f3f4f6,#eef2ff); min-height:100vh; }
+.login-card { border-radius:12px; box-shadow:0 10px 30px rgba(15,23,42,0.06); border:none; }
+.login-card .btn-primary { background: linear-gradient(90deg,#4f46e5,#06b6d4); border:none; }
+.footer-note{ font-size:0.85rem; color:#6b7280; }
+.invalid-feedback{ display:block; }
