@@ -1,6 +1,8 @@
 <?php
 namespace app\models;
 
+use Flight;
+
 class User
 {
     public $id_user;
@@ -41,12 +43,31 @@ class User
     public function login()
     {
         $DBH = \Flight::db();
-        $sql = $DBH->prepare("SELECT id_user, mdp_hash FROM Utilisateur WHERE email = ?");
+        $sql = $DBH->prepare("SELECT * FROM Utilisateur WHERE email = ?");
         $sql->execute([$this->email]);
         $user = $sql->fetch(\PDO::FETCH_ASSOC);
 
         if ($user && password_verify($this->mdp_hash, $user['mdp_hash'])) {
             return $user['id_user'];
+        }
+        return false;
+    }
+    public static function type($id_user)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT type_user FROM Utilisateur WHERE id_user= ?");
+        $sql->bindValue(1, $id_user, \PDO::PARAM_INT);
+        $sql->execute();
+        $type = $sql->fetch(\PDO::FETCH_ASSOC);
+        if ($type) {
+            return $type['type_user'];
+        }
+        return null;
+    }
+    public static function adminOrNot($id_user)
+    {
+        if (User::type($id_user) === "admin") {
+            return true;
         }
         return false;
     }
