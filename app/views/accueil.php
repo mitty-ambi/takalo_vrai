@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +8,16 @@
     <link rel="stylesheet" href="/assets/css/sidebar.css">
     <link rel="stylesheet" href="/assets/css/dashboard.css">
 </head>
+
 <body>
     <!-- Header -->
-     
     <header class="dashboard-header">
-        
+
         <div class="header-content">
             <div>
                 <h1 class="header-title">Takalo Vrai</h1>
-                <p class="header-subtitle">Bienvenue, <?= htmlspecialchars($user_data['prenom'] ?? 'Utilisateur'); ?> 👋</p>
+                <p class="header-subtitle">Bienvenue, <?= htmlspecialchars($user_data['prenom'] ?? 'Utilisateur'); ?> 👋
+                </p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">
@@ -32,7 +34,8 @@
     <!-- Main Content -->
     <main class="dashboard-container">
         <!-- Section Title with Action Buttons -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <h2 class="section-title" style="margin-bottom: 0; flex: 1; min-width: 200px;">Mes Objets en Échange</h2>
             <div style="display: flex; gap: 1rem;">
                 <a href="/add-object" class="btn btn-primary">➕ Ajouter un objet</a>
@@ -48,8 +51,8 @@
                         <!-- Image -->
                         <div class="objet-image-container">
                             <?php if (isset($images_par_objet[$objet['id_objet']]) && count($images_par_objet[$objet['id_objet']]) > 0): ?>
-                                <img src="<?= htmlspecialchars($images_par_objet[$objet['id_objet']][0]['url_image']); ?>" 
-                                     alt="<?= htmlspecialchars($objet['nom_objet']); ?>">
+                                <img src="<?= htmlspecialchars($images_par_objet[$objet['id_objet']][0]['url_image']); ?>"
+                                    alt="<?= htmlspecialchars($objet['nom_objet']); ?>">
                             <?php else: ?>
                                 <div class="objet-no-image">
                                     📸
@@ -75,12 +78,14 @@
                             </div>
 
                             <div class="objet-price">
-                                💰 <?= number_format((float)$objet['prix_estime'], 2, ',', ' '); ?> Ar
+                                💰 <?= number_format((float) $objet['prix_estime'], 2, ',', ' '); ?> Ar
                             </div>
 
                             <div class="objet-actions">
                                 <a href="/edit-object/<?= $objet['id_objet']; ?>" class="btn btn-primary">✏️ Modifier</a>
-                                <a href="/delete-object/<?= $objet['id_objet']; ?>" class="btn btn-secondary" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objet ?');">🗑️ Supprimer</a>
+                                <a href="/delete-object/<?= $objet['id_objet']; ?>" class="btn btn-secondary"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objet ?');">🗑️
+                                    Supprimer</a>
                             </div>
                         </div>
                     </div>
@@ -102,4 +107,5 @@
         <p>© 2026 Takalo Vrai — Fait avec ❤️ par la communauté</p>
     </footer>
 </body>
+
 </html>

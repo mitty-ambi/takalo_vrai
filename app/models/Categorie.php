@@ -70,5 +70,13 @@ class Categorie
         $sql->bindValue(2, $this->id_categorie, \PDO::PARAM_INT);
         return $sql->execute();
     }
+    public function verify()
+    {
+
+    }
+    // public function getAll()
+    // {
+
+    // }
 }
 ?>
