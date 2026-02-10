@@ -25,7 +25,7 @@ class Categorie
     }
     public function getAll()
     {
-    
+        
     }
 }
 ?>
