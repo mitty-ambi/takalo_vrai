@@ -23,7 +23,10 @@ $router->group('', function (Router $router) use ($app) {
         $app->render('login', ['connected' => '1']);
     });
     $router->get('/AdminCat', function () use ($app) {
-        $app->render('AdminCat', ['connected' => '1']);
+
+        $cat = new Categorie(0, null);
+        $listeCat = $cat->getAll();
+        $app->render('AdminCat', ['listeCat' => $listeCat]);
     });
     $router->get('/dashboard', function () use ($app) {
         if (isset($_SESSION['id_user'])) {
@@ -90,12 +93,15 @@ $router->group('', function (Router $router) use ($app) {
         }
     });
     $router->post('/addCat', function () use ($app) {
-        $nom_cat = $_POST['cat'];
-        $cat = new Categorie(null, $nom_cat);
-        $cat->insert();
+        if (isset($_POST['cat'])) {
+            $nom_cat = $_POST['cat'];
+            $cat = new Categorie(0, $nom_cat);
+            $cat->insert();
+        }
+        $app->redirect('/AdminCat');
     });
 
-    $router->get('/dashboard', function () use ($app) {
+    $router->get('/dashboard', function () use ($app): void {
         if (isset($_SESSION['id_user'])) {
             $user_data = $_SESSION['user_data'] ?? [];
             error_log('[DEBUG] ID utilisateur: ' . $_SESSION['id_user']);
@@ -122,7 +128,6 @@ $router->group('', function (Router $router) use ($app) {
                 } else {
                     $images = [];
                 }
-                
                 if ($images) {
                     $images_par_objet[$objet['id_objet']] = $images;
                 } else {
@@ -146,5 +151,42 @@ $router->group('', function (Router $router) use ($app) {
             'user_data' => $_SESSION['user_data'] ?? [],
             'categories' => $categories,
         ]);
+    });
+
+    $router->post('/deleteCat', function () use ($app) {
+        $id = $_POST['id'] ?? null;
+        $cat = new Categorie($id, null);
+
+        try {
+            $cat->delete_cat();
+            header_remove('Content-Security-Policy');
+            header('Content-Type: text/plain');
+            echo "success";
+            return;
+        } catch (\Throwable $e) {
+            header('Content-Type: text/plain', true, 500);
+            echo "Erreur : " . $e->getMessage();
+            return;
+        }
+
+    });
+
+    $router->post('/api/editCat', function () use ($app) {
+        $id = $_POST['id'] ?? null;
+        $nom = $_POST['nom'] ?? null;
+        if (!$id || $nom === null) {
+            header('Content-Type: application/json', true, 400);
+            echo json_encode(['success' => false, 'error' => 'Missing parameters']);
+            return;
+        }
+        $cat = new Categorie($id, $nom);
+        try {
+            $ok = $cat->update();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => (bool) $ok]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json', true, 500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
     });
 }, [SecurityHeadersMiddleware::class]);

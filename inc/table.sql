@@ -3,9 +3,11 @@ USE takalo;
 
 CREATE TABLE Categorie (
     id_categorie INT PRIMARY KEY AUTO_INCREMENT,
-    nom_categorie VARCHAR(100) NOT NULL
+    nom_categorie VARCHAR(100) NOT NULL,
+    date_creation DATE NOT NULL,
 );
 
+ALTER TABLE Categorie add date_creation DATE NOT NULL;
 CREATE TABLE Utilisateur(
     id_user INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL,
