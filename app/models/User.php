@@ -50,5 +50,12 @@ class User
         }
         return false;
     }
+    public function get_user_by_id($id_user)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Utilisateur WHERE id_user = ?");
+        $sql->execute([$id_user]);
+        return $sql->fetch(\PDO::FETCH_ASSOC);
+    }
 }
 ?>

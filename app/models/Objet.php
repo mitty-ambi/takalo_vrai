@@ -64,7 +64,7 @@ class Objet
             return false;
         }
     }
-    public function get_objet_by_id_user($id_user)
+    public static function get_objet_by_id_user($id_user)
     {
         $DBH = \Flight::db();
         $query = "SELECT * FROM Objet WHERE id_user = :id_user";
