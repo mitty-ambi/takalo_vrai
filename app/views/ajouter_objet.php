@@ -6,6 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <p>nom de l'objet : <input type="text"></p>
+    <p>blabla</p>
 </body>
 </html>
