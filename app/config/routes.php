@@ -5,6 +5,7 @@ use flight\net\Router;
 use app\models\User;
 use app\models\Objet;
 use app\models\Image_objet;
+use app\models\Categorie;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -87,5 +88,57 @@ $router->group('', function (Router $router) use ($app) {
         } else {
             $app->render('login', ['error' => "Email ou mot de passe incorrect"]);
         }
+    });
+    $router->get('/dashboard', function () use ($app) {
+        if (isset($_SESSION['id_user'])) {
+            $user_data = $_SESSION['user_data'] ?? [];
+            error_log('[DEBUG] ID utilisateur: ' . $_SESSION['id_user']);
+            $objetClass = 'app\\models\\Objet';
+            if (class_exists($objetClass)) {
+                $objets = call_user_func([$objetClass, 'get_objet_by_id_user'], $_SESSION['id_user']);
+                error_log('[DEBUG] Résultat get_objet_by_id_user: ' . json_encode($objets));
+            } else {
+                error_log('Classe introuvable: ' . $objetClass);
+                $objets = [];
+            }
+            $image_objet = null;
+            $images_par_objet = [];
+            $imageObjetClass = 'app\\models\\Image_objet';
+            if (class_exists($imageObjetClass)) {
+                $image_objet = new $imageObjetClass();
+            } else {
+                error_log('Classe introuvable: ' . $imageObjetClass);
+            }
+            foreach ($objets as &$objet) {
+                $images = [];
+                if ($image_objet) {
+                    $images = $image_objet->get_image_by_objet($objet['id_objet']);
+                } else {
+                    $images = [];
+                }
+                
+                if ($images) {
+                    $images_par_objet[$objet['id_objet']] = $images;
+                } else {
+                    $images_par_objet[$objet['id_objet']] = [];
+                }
+            }
+            $app->render('accueil', ['user_data' => $user_data, 'objets' => $objets, 'images_par_objet' => $images_par_objet]);
+        } else {
+            $app->redirect('/login');
+        }
+    });
+    $router->get('/add-object', function () use ($app) {
+        $CategorieObject = 'app\\models\\Categorie';
+        if (class_exists($CategorieObject)) {
+            $categories = call_user_func([$CategorieObject, 'get_all_categories']);
+        } else {
+            error_log('Classe introuvable: ' . $CategorieObject);
+            $categories = [];
+        }
+        $app->render('ajouter_objet', [
+            'user_data' => $_SESSION['user_data'] ?? [],
+            'categories' => $categories,
+        ]);
     });
 }, [SecurityHeadersMiddleware::class]);
