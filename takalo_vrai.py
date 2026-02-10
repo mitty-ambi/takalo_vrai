@@ -58,6 +58,8 @@ class Exchange:
             self.status = "Accepted"
             self.offerer_item.owner = self.receiver
             self.receiver_item.owner = self.offerer
+            self.offerer_item.available = False
+            self.receiver_item.available = False
             return True
         return False
     
@@ -125,8 +127,8 @@ class Marketplace:
         
         if query:
             query_lower = query.lower()
-            results = [item for item in results 
-                      if query_lower in item.name.lower() 
+            results = [item for item in results
+                      if query_lower in item.name.lower()
                       or query_lower in item.description.lower()]
         
         if category:

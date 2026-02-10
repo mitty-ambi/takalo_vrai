@@ -54,6 +54,9 @@ class TestExchange(unittest.TestCase):
         self.assertEqual(exchange.status, "Accepted")
         self.assertEqual(self.item1.owner, "Bob")
         self.assertEqual(self.item2.owner, "Alice")
+        # Items should be marked as unavailable after exchange
+        self.assertFalse(self.item1.available)
+        self.assertFalse(self.item2.available)
     
     def test_reject_exchange(self):
         """Test rejecting an exchange."""
