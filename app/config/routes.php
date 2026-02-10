@@ -22,6 +22,30 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/login', function () use ($app) {
         $app->render('login', ['connected' => '1']);
     });
+    $router->get('/AdminCat', function () use ($app) {
+        $app->render('AdminCat', ['connected' => '1']);
+    });
+    $router->get('/dashboard', function () use ($app) {
+        if (isset($_SESSION['id_user'])) {
+            $user_data = $_SESSION['user_data'] ?? [];
+            $objets = Objet::get_objet_by_id_user($_SESSION['id_user']);
+            $image_objet = new Image_objet();
+            $images_par_objet = [];
+            foreach ($objets as &$objet) {
+                $images = $image_objet->get_image_by_objet($objet['id']);
+
+                if ($images) {
+                    $images_par_objet[$objet['id']] = $images;
+                } else {
+                    $images_par_objet[$objet['id']] = [];
+                }
+            }
+            $app->render('accueil', ['user_data' => $user_data, 'objets' => $objets, 'images_par_objet' => $images_par_objet]);
+        } else {
+            $app->redirect('/login');
+        }
+    });
+
     $router->post('/register', function () use ($app) {
         echo "[DEBUG] POST /register recu" . PHP_EOL;
         echo "[DEBUG] Data: " . json_encode($_POST) . PHP_EOL;

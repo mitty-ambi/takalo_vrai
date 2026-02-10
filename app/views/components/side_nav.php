@@ -1,6 +1,11 @@
 <?php
 use app\models\User;
 ?>
+<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="/assets/css/register.css">
+<link rel="stylesheet" href="/assets/css/auth.css">
+<link rel="stylesheet" href="/assets/css/sidebar.css">
+
 <aside class="auth-sidebar" aria-hidden="false">
     <div class="auth-sidebar-inner">
         <div class="brand mb-3">
@@ -17,10 +22,10 @@ use app\models\User;
 
         <nav class="auth-nav">
             <ul>
+                <li class="mb-2"><a href="/" class="auth-link">Accueil</a></li>
                 <li class="mb-2"><a href="/" class="auth-link">S'inscrire</a></li>
                 <li class="mb-2"><a href="/login" class="auth-link active">Se connecter</a></li>
-                <li class="mb-2"><a href="/" class="auth-link">Accueil</a></li>
-                <?php if (User::adminOrNot($_SESSION["id_user"])) { ?>
+                <?php if (User::adminOrNot(id_user: $_SESSION["id_user"])) { ?>
                     <li class="mt-2"><a href="/AdminCat" class="auth-link">Catégorie</a></li>
                 <?php } ?>
                 <li class="mb-2"><a href="/help" class="auth-link">Aide & support</a></li>
