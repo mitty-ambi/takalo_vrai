@@ -57,11 +57,10 @@
                                 <td><strong>42</strong> objets</td>
                                 <td><span class="badge badge-success">Active</span></td>
                                 <td class="actions-cell">
-                                    <button class="btn-action btn-edit">✏️ Modifier</button>
-                                    <button onclick="alert('TEST DIRECT')"
-                                        style="position:fixed; top:10px; right:10px; background:red; color:white; padding:10px;">
-                                        TEST CLICK
-                                    </button>
+                                    <a class="btn-action btn-edit"
+                                        href="/EditCat?id_categorie=<?= $cat['id_categorie'] ?>">✏️ Modifier</a>
+                                    <button class="btn-action btn-delete" type="button"
+                                        aria-label="Supprimer cette catégorie">🗑️ Supprimer</button>
                                 </td>
                             </tr>
                         <?php } ?>
@@ -92,20 +91,49 @@
     </div>
 </body>
 <!-- Remplace ton script par : -->
-<script>
-    // Attendre que tout soit chargé
+<script nonce="<?= Flight::app()->get('csp_nonce') ?>">
     window.addEventListener('load', function () {
-        console.log('Page chargée');
-
         const buttons = document.querySelectorAll('.btn-delete');
-        console.log('Nombre de boutons:', buttons.length);
 
-        // Test direct : assigne onclick
         buttons.forEach(button => {
-            button.onclick = function () {
-                alert('CLICK !');
-                return false;
-            };
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const tr = this.closest('tr');
+                if (!tr) return;
+                const id = tr.dataset.id;
+                if (!id) return;
+
+                if (!confirm('Supprimer cette catégorie ?')) return;
+
+                fetch('/deleteCat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id=' + encodeURIComponent(id)
+                }).then(response => {
+                    if (!response.ok) throw new Error('Erreur réseau');
+                    return response.text();
+                }).then(text => {
+                    if (text.trim() === 'success') {
+                        tr.remove();
+                        // Optionally update counts on page
+                        const badges = document.querySelectorAll('.badge');
+                        // update first badge showing total categories
+                        const totalBadge = document.querySelector('.table-section .badge');
+                        if (totalBadge) {
+                            const m = totalBadge.textContent.match(/(\d+)/);
+                            if (m) {
+                                const newVal = parseInt(m[1], 10) - 1;
+                                totalBadge.textContent = newVal + ' catégories';
+                            }
+                        }
+                    } else {
+                        alert('Erreur suppression: ' + text);
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('Erreur lors de la suppression');
+                });
+            });
         });
     });
 </script>

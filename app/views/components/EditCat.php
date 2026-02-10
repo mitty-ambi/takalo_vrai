@@ -1,8 +1,16 @@
 <?php
 use Flight;
 
-$id = $_GET['id_categorie'] ?? null;
-$category = null;
+$category = $category ?? null;
+if (empty($category)) {
+    $id = $_GET['id_categorie'] ?? $_GET['id'] ?? null;
+    if ($id) {
+        $DBH = \Flight::db();
+        $stmt = $DBH->prepare('SELECT * FROM Categorie WHERE id_categorie = ?');
+        $stmt->execute([$id]);
+        $category = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
