@@ -1,3 +1,4 @@
+<?php header_remove('Content-Security-Policy'); ?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -32,7 +33,8 @@
 
         <!-- Tableau des catégories -->
         <section class="table-section">
-            <h2>Liste des catégories <span class="badge badge-primary">5 catégories</span></h2>
+            <h2>Liste des catégories <span class="badge" style="color: black;"><?= count($listeCat) ?> catégories</span>
+            </h2>
 
             <div class="table-container">
                 <table>
@@ -47,17 +49,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="id-cell">#001</td>
-                            <td class="category-cell">Électronique</td>
-                            <td>15/01/2024</td>
-                            <td><strong>42</strong> objets</td>
-                            <td><span class="badge badge-success">Active</span></td>
-                            <td class="actions-cell">
-                                <button class="btn-action btn-edit">✏️ Modifier</button>
-                                <button class="btn-action btn-delete">🗑️ Supprimer</button>
-                            </td>
-                        </tr>
+                        <?php foreach ($listeCat as $cat) { ?>
+                            <tr data-id="<?= $cat['id_categorie'] ?>">
+                                <td class="id-cell">#<?= $cat['id_categorie'] ?></td>
+                                <td class="category-cell"><?= htmlspecialchars($cat['nom_categorie']) ?></td>
+                                <td><?= $cat['date_creation'] ?></td>
+                                <td><strong>42</strong> objets</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td class="actions-cell">
+                                    <button class="btn-action btn-edit">✏️ Modifier</button>
+                                    <button onclick="alert('TEST DIRECT')"
+                                        style="position:fixed; top:10px; right:10px; background:red; color:white; padding:10px;">
+                                        TEST CLICK
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
@@ -65,7 +72,7 @@
             <!-- Statistiques -->
             <div class="stats">
                 <div class="stat-card">
-                    <h3>5</h3>
+                    <h3><?= count($listeCat) ?></h3>
                     <p>Catégories totales</p>
                 </div>
                 <div class="stat-card">
@@ -73,7 +80,7 @@
                     <p>Objets au total</p>
                 </div>
                 <div class="stat-card">
-                    <h3>5</h3>
+                    <h3><?= count($listeCat) ?></h3>
                     <p>Catégories actives</p>
                 </div>
                 <div class="stat-card">
@@ -83,38 +90,24 @@
             </div>
         </section>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const buttons = document.querySelectorAll('.btn-action');
-            buttons.forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const action = this.classList.contains('btn-edit') ? 'modifier' : 'supprimer';
-                    const category = this.closest('tr').querySelector('.category-cell').textContent;
-
-                    if (action === 'supprimer') {
-                        if (confirm(`Voulez-vous vraiment supprimer la catégorie "${category}" ?`)) {
-                            alert(`Catégorie "${category}" supprimée (simulation)`);
-                        }
-                    } else {
-                        alert(`Modification de la catégorie "${category}" (simulation)`);
-                    }
-                });
-            });
-
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const input = document.getElementById('cat');
-                if (input.value.trim()) {
-                    alert(`Catégorie "${input.value}" ajoutée avec succès !`);
-                    input.value = '';
-                }
-            });
-        });
-
-    </script>
 </body>
+<!-- Remplace ton script par : -->
+<script>
+    // Attendre que tout soit chargé
+    window.addEventListener('load', function () {
+        console.log('Page chargée');
+
+        const buttons = document.querySelectorAll('.btn-delete');
+        console.log('Nombre de boutons:', buttons.length);
+
+        // Test direct : assigne onclick
+        buttons.forEach(button => {
+            button.onclick = function () {
+                alert('CLICK !');
+                return false;
+            };
+        });
+    });
+</script>
 
 </html>
