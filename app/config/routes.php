@@ -16,8 +16,37 @@ ini_set('display_startup_errors', 1);
  */
 
 $router->group('', function (Router $router) use ($app) {
-    $router->get('/', function () use ($app) {
+    $router->get('/register', function () use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
+    });
+    $router->get('/register', function () use ($app) {
+        $app->render('register', ['ls_donnees_prod' => 'a']);
+    });
+    $router->get('/EditCat', function () use ($app) {
+        $id = $_GET['id_categorie'] ?? null;
+        $category = null;
+        if ($id) {
+            $DBH = \Flight::db();
+            $stmt = $DBH->prepare('SELECT * FROM Categorie WHERE id_categorie = ?');
+            $stmt->execute([$id]);
+            $category = $stmt->fetch(\PDO::FETCH_ASSOC);
+        }
+        $app->render('components/EditCat', ['category' => $category]);
+    });
+
+    // POST handler for EditCat: update name and redirect to AdminCat
+    $router->post('/EditCat', function () use ($app) {
+        $id = $_POST['id'] ?? null;
+        $nom = $_POST['nom'] ?? null;
+        if ($id && $nom !== null) {
+            $cat = new Categorie($id, $nom);
+            try {
+                $cat->update();
+            } catch (\Throwable $e) {
+                error_log('EditCat update error: ' . $e->getMessage());
+            }
+        }
+        $app->redirect('/AdminCat');
     });
     $router->get('/login', function () use ($app) {
         $app->render('login', ['connected' => '1']);
@@ -156,7 +185,6 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/deleteCat', function () use ($app) {
         $id = $_POST['id'] ?? null;
         $cat = new Categorie($id, null);
-
         try {
             $cat->delete_cat();
             header_remove('Content-Security-Policy');
@@ -168,7 +196,6 @@ $router->group('', function (Router $router) use ($app) {
             echo "Erreur : " . $e->getMessage();
             return;
         }
-
     });
 
     $router->post('/api/editCat', function () use ($app) {
