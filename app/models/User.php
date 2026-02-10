@@ -26,7 +26,7 @@ class User
     {
         try {
             $DBH = \Flight::db();
-            $sql = $DBH->prepare("INSERT INTO Utilisateur (nom,prenom,email,mdp_hash,type_user) VALUES (?,?,?,?,?)");
+            $sql = $DBH->prepare("INSERT INTO Utilisateur (nom,prenom,email,mdp_hash,type_user,date_creation) VALUES (?,?,?,?,?,NOW())");
 
             $sql->bindValue(1, $this->nom, \PDO::PARAM_STR);
             $sql->bindValue(2, $this->prenom, \PDO::PARAM_STR);
@@ -39,6 +39,18 @@ class User
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+    public static function emailExists($email)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Utilisateur WHERE email = ?");
+        $sql->bindValue(1, $email, \PDO::PARAM_STR);
+        $sql->execute();
+        $type = $sql->fetch(\PDO::FETCH_ASSOC);
+        if ($type) {
+            return true;
+        }
+        return null;
     }
     public function login()
     {
