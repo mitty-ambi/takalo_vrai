@@ -20,7 +20,7 @@
 
         <!-- Formulaire d'ajout -->
         <section class="form-section">
-            <h2>Ajouter une nouvelle catégorie</h2>     
+            <h2>Ajouter une nouvelle catégorie</h2>
             <form action="/addCat" method="POST" class="form-group">
                 <div class="input-wrapper">
                     <label for="cat">Nom de la catégorie</label>
