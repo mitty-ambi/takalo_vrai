@@ -17,6 +17,10 @@ class ComposerStaticInit4b3a253f57d31d773b6986822b8dc6cf
         array (
             'flight\\' => 7,
         ),
+        'a' => 
+        array (
+            'app\\' => 4,
+        ),
         'T' => 
         array (
             'Tracy\\' => 6,
@@ -35,6 +39,10 @@ class ComposerStaticInit4b3a253f57d31d773b6986822b8dc6cf
         'flight\\' => 
         array (
             0 => __DIR__ . '/..' . '/flightphp/runway/src',
+        ),
+        'app\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
         'Tracy\\' => 
         array (

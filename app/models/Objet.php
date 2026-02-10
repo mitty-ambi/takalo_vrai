@@ -1,4 +1,9 @@
 <?php
+
+namespace app\models;
+
+use PDO;
+use app\models\Connection;
 class Objet
 {
     public $id;
@@ -48,13 +53,12 @@ class Objet
     public function insert_base()
     {
         $DBH = \Flight::db();
-        $query = "INSERT INTO Objet (nom, id_categorie, id_user, date_acquisition, description, prix_estime) VALUES (:nom, :id_categorie, :id_user, :date_acquisition, :description, :prix_estime)";
+        $query = "INSERT INTO Objet (nom_objet, id_categorie, id_user, date_acquisition, prix_estime) VALUES (:nom, :id_categorie, :id_user, :date_acquisition, :prix_estime)";
         $stmt = $DBH->prepare($query);
         $stmt->bindParam(':nom', $this->nom);
         $stmt->bindParam(':id_categorie', $this->id_categorie);
         $stmt->bindParam(':id_user', $this->id_user);
         $stmt->bindParam(':date_acquisition', $this->date_acquisition);
-        $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':prix_estime', $this->prix_estime);
         if ($stmt->execute()) {
             return true;
@@ -67,10 +71,15 @@ class Objet
         $DBH = \Flight::db();
         $query = "SELECT * FROM Objet WHERE id_user = :id_user";
         $stmt = $DBH->prepare($query);
-        $stmt->bindParam(':id_user', $id_user);
-        if ($stmt->execute()) {
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
+        $stmt->bindValue(':id_user', $id_user, PDO::PARAM_INT);
+        try {
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log('[DEBUG] Query: ' . $query . ' with id_user: ' . $id_user);
+            error_log('[DEBUG] Result count: ' . count($result));
+            return $result;
+        } catch (\Exception $e) {
+            error_log('[ERROR] get_objet_by_id_user: ' . $e->getMessage());
             return false;
         }
     }
