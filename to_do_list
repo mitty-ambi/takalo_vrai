@@ -1,0 +1,29 @@
+to do list:
+    -(ok)mettre index.html dans views:
+        .(ok)placer les assets dependants:
+            *(ok)js
+            *(ok)css
+            *(ok)assets
+    -(ok)placement dans route.php:
+        .analytics.html
+        .users.html
+        .products.html
+        .orders.html
+        .forms.html
+        .elements.html
+        .elements-buttons.html
+        .elements-alerts.html
+        .elements-badges.html
+        .elements-cards.html
+        .elements-modals.html
+        .elements-forms.html
+        .elements-tables.html
+        .reports.html
+        .messages.html
+        .calendar.html
+        .settings.html
+        .files.html
+        .security.html
+        .help.html
+    -(ok)creer navbar.php pour un modele de navbar
+    -(ok)include le navbar dans tous les fichiers
