@@ -11,11 +11,21 @@ class Categorie
     }
     public function insert()
     {
-        // Utiliser la connexion fournie par Flight (config.php/services.php)
         $DBH = \Flight::db();
         $stmt = $DBH->prepare("INSERT INTO Categorie (nom_categorie) VALUES (:nom_categorie)");
         $stmt->bindParam(':nom_categorie', $this->nom_categorie);
         return $stmt->execute();
+    }
+    public function delete_cat()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("DELETE FROM Categorie WHERE id_categorie = ?");
+        $sql->bindValue(1, $this->id_categorie, \PDO::PARAM_INT);
+        $sql->execute();
+    }
+    public function getAll()
+    {
+    
     }
 }
 ?>

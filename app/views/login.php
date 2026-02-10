@@ -15,7 +15,6 @@
 
 <body class="login-bg">
     <?php
-    // TESTS - Mets ça EN HAUT pour voir ce qui se passe
     echo "<div style='position:fixed; top:10px; right:10px; background:#fff; padding:10px; border-radius:5px; z-index:9999;'>";
     echo "Session ID: " . ($_SESSION["id_user"] ?? 'NON DÉFINI');
     echo "</div>";
@@ -43,7 +42,6 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Change action et méthode -->
                 <form id="loginForm" method="POST" action="/login" novalidate>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -64,7 +62,6 @@
         </div>
     </main>
 
-    <!-- Optionnel : Pour debug -->
     <script>
         console.log("Session ID User:", <?= json_encode($_SESSION['id_user'] ?? null) ?>);
     </script>
