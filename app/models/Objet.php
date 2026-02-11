@@ -119,7 +119,7 @@ class Objet
         if (!empty($conditions)) {
             $where = "WHERE " . implode(" AND ", $conditions);
         }
-        $sql += $where;
+        $sql .= $where;
 
         $stmt = $DBH->prepare($sql);
         $stmt->execute($params);
