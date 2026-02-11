@@ -32,6 +32,17 @@ class User
         }
         return $data;
     }
+    public function getRegistrationsPerDay()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare('SELECT DATE(date_creation) AS date, COUNT(*) AS count FROM Utilisateur GROUP BY DATE(date_creation) ORDER BY DATE(date_creation) ASC');
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
     public function insert_user()
     {
         try {

@@ -20,8 +20,18 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
         $statsParJour = UserController::StatsRegister($user);
+        $registerCounts = [];
+
+        try {
+            $registerCounts = $user->getRegistrationsPerDay();
+            error_log("registerCounts: " . print_r($registerCounts, true));
+        } catch (\Throwable $e) {
+            error_log('Erreur getRegistrationsPerDay: ' . $e->getMessage());
+        }
+
         $app->render('AdminStats', [
-            'statsParJour' => $statsParJour
+            'statsParJour' => $statsParJour,
+            'registerCounts' => $registerCounts,
         ]);
     });
     $router->get('/register', function () use ($app) {
