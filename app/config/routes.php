@@ -7,6 +7,7 @@ use app\models\User;
 use app\models\Objet;
 use app\models\Image_objet;
 use app\models\Categorie;
+use app\models\EchangeMere;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -24,6 +25,8 @@ $router->group('', function (Router $router) use ($app) {
         $user = new User(null, null, null, null, null);
         $statsParJour = UserController::StatsRegister($user);
         $registerCounts = [];
+        $exchangeCounts = [];
+        $allExchanges = [];
 
         try {
             $registerCounts = $user->getRegistrationsPerDay();
@@ -32,9 +35,20 @@ $router->group('', function (Router $router) use ($app) {
             error_log('Erreur getRegistrationsPerDay: ' . $e->getMessage());
         }
 
+        try {
+            $echange = new EchangeMere(null, null, null, null, null, null);
+            $exchangeCounts = $echange->getExchangesPerDay();
+            $allExchanges = $echange->getAllEchange();
+            error_log("exchangeCounts: " . print_r($exchangeCounts, true));
+        } catch (\Throwable $e) {
+            error_log('Erreur getExchangesPerDay: ' . $e->getMessage());
+        }
+
         $app->render('AdminStats', [
             'statsParJour' => $statsParJour,
             'registerCounts' => $registerCounts,
+            'exchangeCounts' => $exchangeCounts,
+            'allExchanges' => $allExchanges,
         ]);
     });
     $router->get('/register', function () use ($app) {
