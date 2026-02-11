@@ -26,6 +26,7 @@ class EchangeFille
     public function create()
     {
         $DBH = \Flight::db();
+        $a = 1;
         $query = "INSERT INTO Echange_fille (id_echange_mere, id_objet, quantite, id_proprietaire) VALUES (:id_echange_mere, :id_objet, :quantite, :id_proprietaire)";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':id_echange_mere', (int) $this->id_echange_mere, PDO::PARAM_INT);
