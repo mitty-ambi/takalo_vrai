@@ -87,7 +87,7 @@ $router->group('', function (Router $router) use ($app) {
         if (User::emailExists($email)) {
             $app->render('register', ['error_login' => 'email existe déjà']);
         }
-        $password = $_POST['password'] ?? ''; 
+        $password = $_POST['password'] ?? '';
         $type_user = $_POST['type_user'] ?? 'normal';
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
