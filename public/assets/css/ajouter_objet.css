@@ -1,0 +1,135 @@
+.conteneur-formulaire {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 2rem auto;
+}
+
+.titre-formulaire {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.groupe-formulaire {
+    margin-bottom: 1.5rem;
+}
+
+.label-formulaire {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.entree-formulaire,
+.select-formulaire,
+.zone-texte-formulaire {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.zone-texte-formulaire {
+    resize: vertical;
+    min-height: 180px;
+}
+
+.entree-formulaire:focus,
+.select-formulaire:focus,
+.zone-texte-formulaire:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.section-images {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.section-images h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.section-images h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.images-existantes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.element-image {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.element-image img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
+.info-fichier {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 0.5rem;
+}
+
+.actions-formulaire {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.bouton-envoyer {
+    flex: 1;
+    padding: 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.bouton-envoyer:hover {
+    background-color: #45a049;
+}
+
+.bouton-annuler {
+    flex: 1;
+    padding: 1rem;
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.bouton-annuler:hover {
+    background-color: #e0e0e0;
+}

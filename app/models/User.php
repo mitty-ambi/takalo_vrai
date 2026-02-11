@@ -81,6 +81,14 @@ class User
         $sql->execute([$id_user]);
         return $sql->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public static function get_user_by_id_static($id_user)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Utilisateur WHERE id_user = ?");
+        $sql->execute([$id_user]);
+        return $sql->fetch(\PDO::FETCH_ASSOC);
+    }
     public static function type($id_user)
     {
         $DBH = \Flight::db();
