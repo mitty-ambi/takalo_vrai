@@ -58,7 +58,7 @@ header_remove('Content-Security-Policy');
             </form>
         </div>
 
-        <!-- Results Section - S'affiche seulement quand on a des résultats -->
+        <!-- Results Section -->
         <?php if (isset($objets)): ?>
             <div class="results-section">
                 <div class="results-header">
@@ -70,25 +70,23 @@ header_remove('Content-Security-Policy');
                         <?php endif; ?>
                     </h3>
 
-                    <a href="/search" class="btn-reset">
-                        ✖ Réinitialiser
-                    </a>
+                    <?php if (!empty($_POST['keyword']) || !empty($_POST['categorie'])): ?>
+                        <a href="/search" class="btn-reset">
+                            ✖ Réinitialiser
+                        </a>
+                    <?php endif; ?>
                 </div>
 
                 <?php if (count($objets) > 0): ?>
                     <div class="objets-grid">
                         <?php foreach ($objets as $objet): ?>
                             <div class="objet-card">
-                                <div class="objet-image-container">
-                                    <?php if (isset($images_par_objet[$objet['id_objet']]) && count($images_par_objet[$objet['id_objet']]) > 0): ?>
-                                        <img src="<?= htmlspecialchars($images_par_objet[$objet['id_objet']][0]['url_image']); ?>"
-                                            alt="<?= htmlspecialchars($objet['nom_objet']); ?>">
-                                    <?php else: ?>
-                                        <div class="objet-no-image">
-                                            📸
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
+                                <?php
+                                $images = $images_objet[$objet['id_objet']] ?? [];
+                                $image_src = !empty($images) ? htmlspecialchars($images[0]['url_image']) : '/assets/images/no-image.png';
+                                ?>
+                                <img src="<?= $image_src; ?>" alt="<?= htmlspecialchars($objet['nom_objet']); ?>"
+                                    class="objet-image">
 
                                 <div class="objet-content">
                                     <h3 class="objet-title">
@@ -117,36 +115,36 @@ header_remove('Content-Security-Policy');
                                         </div>
                                         <div class="objet-meta-item">
                                             <span class="objet-meta-icon">👤</span>
-                                            <span>Propriétaire: ID <?= htmlspecialchars($objet['id_user']); ?></span>
+                                            <span><?= htmlspecialchars($objet['nom_proprietaire'] ?? 'Propriétaire ID: ' . $objet['id_user']); ?></span>
                                         </div>
                                     </div>
 
                                     <div class="objet-price">
-                                        💰 <?= number_format((float) $objet['prix_estime'], 2, ',', ' '); ?> Ar
+                                        💰 <?= number_format((float) $objet['prix_estime'], 0, ',', ' '); ?> Ar
                                     </div>
 
                                     <div class="objet-actions">
-                                        <a href="/objet/<?= $objet['id_objet']; ?>" class="btn btn-primary">👁️ Voir détails</a>
-                                        <a href="/proposer-echange/<?= $objet['id_objet']; ?>" class="btn btn-secondary">🔄 Proposer
-                                            échange</a>
+                                        <a href="/objet/<?= $objet['id_objet']; ?>" class="btn btn-primary">👁️ Voir</a>
+                                        <a href="/proposer-echange/<?= $objet['id_objet']; ?>" class="btn btn-secondary">🔄
+                                            Proposer</a>
                                     </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <!-- Empty State -->
                     <div class="empty-state">
                         <div class="empty-state-icon">🔍</div>
                         <h3 class="empty-state-title">Aucun objet trouvé</h3>
                         <p class="empty-state-text">
                             Essayez avec d'autres mots-clés ou catégories
                         </p>
-                        <a href="/search" class="btn btn-primary">✖ Réinitialiser la recherche</a>
+                        <a href="/search" class="btn btn-primary">✖ Réinitialiser</a>
                     </div>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
     </main>
 </body>
+
 </html>
