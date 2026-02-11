@@ -122,9 +122,8 @@ header_remove('Content-Security-Policy');
                                     <div class="objet-price">
                                         💰 <?= number_format((float) $objet['prix_estime'], 0, ',', ' '); ?> Ar
                                     </div>
-
                                     <div class="objet-actions">
-                                        <a href="/objet/<?= $objet['id_objet']; ?>" class="btn btn-primary">👁️ Voir</a>
+                                        <a href="/detail-objet?id=<?= $objet['id_objet']; ?>" class="btn btn-primary">👁️ Voir</a>
                                         <a href="/proposer-echange/<?= $objet['id_objet']; ?>" class="btn btn-secondary">🔄
                                             Proposer</a>
                                     </div>
