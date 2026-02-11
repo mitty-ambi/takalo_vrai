@@ -118,6 +118,10 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/login', function () use ($app) {
         $app->render('login', ['connected' => '1']);
     });
+    $router->get('/logout', function () use ($app) {
+        session_destroy();
+        $app->render('login', ['connected' => '1']);
+    });
     $router->get('/AdminCat', function () use ($app) {
 
         $cat = new Categorie(0, null);

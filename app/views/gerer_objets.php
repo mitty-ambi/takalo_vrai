@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gérer mes objets - Takalo Vrai</title>
     <link rel="stylesheet" href="/assets/css/sidebar.css">
-    <link rel="stylesheet" href="/assets/css/gerer_objets.css">y
+    <link rel="stylesheet" href="/assets/css/gerer_objets.css">
 
 </head>
 
