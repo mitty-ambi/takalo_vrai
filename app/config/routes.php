@@ -1,4 +1,5 @@
 <?php
+use app\controllers\ObjetController;
 use app\controllers\CategorieController;
 use app\controllers\UserController;
 use app\controllers\ObjectController;
@@ -30,8 +31,16 @@ $router->group('', function (Router $router) use ($app) {
         $listeCat = CategorieController::getAll();
         $app->render('Search', ['listeCat' => $listeCat]);
     });
-    $router->post('/api/search', function () use ($app) {
-        
+    $router->post('/search/results', function () use ($app) {
+        $keyword = $_POST['keyword'] ?? null;
+        $categorie_id = $_POST['categorie'] ?? null;
+
+        $objets = ObjetController::search($keyword, $categorie_id);
+        $listeCat = CategorieController::getAll();
+        $app->render('Search', [
+            'listeCat' => $listeCat,
+            'objets' => $objets
+        ]);
     });
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
