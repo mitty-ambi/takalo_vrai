@@ -111,5 +111,27 @@ class User
         }
         return false;
     }
+    public function getAllUser()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare('SELECT * FROM Utilisateur');
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
+    public static function getUserbyID($id)
+    {
+        $user = new User(null, null, null, null, null);
+        $listeUser = $user->getAllUser();
+        foreach ($listeUser as $u) {
+            if ($u['id_user'] === $id) {
+                return $u;
+            }
+        }
+        return null;
+    }
 }
 ?>

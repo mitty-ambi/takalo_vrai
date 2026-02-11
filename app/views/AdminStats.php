@@ -1,8 +1,6 @@
 <?php
-/**
- * View: AdminStats
- * Affiche un graphique du nombre d'inscriptions par jour et la liste des utilisateurs.
- */
+header_remove('Content-Security-Policy');
+use app\models\User;
 ?>
 
 <!DOCTYPE html>
@@ -27,6 +25,15 @@
                         class="stat-bubble"><?= count($statsParJour) ?></span></div>
             </div>
             <canvas id="registrationsChart" height="120"></canvas>
+        </div>
+
+        <div class="chart-card" style="margin-top:18px">
+            <div class="chart-header">
+                <h2>Échanges effectués par jour</h2>
+                <div class="small-muted">Total échanges acceptés : <span
+                        class="stat-bubble"><?= count($exchangeCounts ?? []) ?></span></div>
+            </div>
+            <canvas id="exchangesChart" height="120"></canvas>
         </div>
 
         <div>
@@ -56,45 +63,39 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <h3 style="margin-top:18px">Liste des utilisateurs</h3>
+
+        <div style="margin-top:28px">
+            <h3>Liste des échanges</h3>
             <table class="user-list">
                 <thead>
                     <tr>
-                        <th>id user</th>
-                        <th>nom</th>
-                        <th>prenom</th>
-                        <th>email</th>
-                        <th>type d'utilisateur</th>
-                        <th>Date creation</th>
+                        <th>id échange</th>
+                        <th>user 1</th>
+                        <th>user 2</th>
+                        <th>statut</th>
+                        <th>date demande</th>
+                        <th>date finalisation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($statsParJour as $stats) { ?>
+                    <?php foreach (($allExchanges ?? []) as $e) { ?>
                         <tr>
-                            <td>
-                                <?= htmlspecialchars($stats['id_user']) ?>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($stats['nom']) ?>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($stats['prenom']) ?>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($stats['email']) ?>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($stats['type_user']) ?>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($stats['date_creation']) ?>
-                            </td>
+                            <td><?= htmlspecialchars($e['id_echange']) ?></td>
+                            <td><?= htmlspecialchars(User::getUserbyID($e['id_user_1'])['prenom']) ?></td>
+                            <td><?= htmlspecialchars(User::getUserbyID($e['id_user_2'])['prenom']) ?></td>
+                            <td><?= htmlspecialchars($e['statut']) ?></td>
+                            <td><?= htmlspecialchars($e['date_demande']) ?></td>
+                            <?php if ($e['date_finalisation'] != null) { ?>
+                                <td><?= htmlspecialchars($e['date_finalisation']) ?></td>
+                            <?php } else { ?>
+                                <td>non défini</td>
+                            <?php } ?>
                         </tr>
                     <?php } ?>
                 </tbody>
             </table>
         </div>
+
 
     </div>
 
@@ -175,6 +176,65 @@
                             }
                         }
                     }
+                }
+            }
+        });
+
+        // --- Graphique échanges ---
+        const exchangeCounts = <?= json_encode($exchangeCounts ?? []) ?>;
+        console.log("Exchanges RAW:", exchangeCounts);
+
+        if (exchangeCounts && exchangeCounts.length > 0) {
+            exchangeCounts.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        const exLabels = (exchangeCounts && exchangeCounts.length > 0)
+            ? exchangeCounts.map(r => {
+                const date = new Date(r.date);
+                const dd = date.getDate().toString().padStart(2, '0');
+                const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+                const yyyy = date.getFullYear();
+                return `${dd}/${mm}/${yyyy}`;
+            })
+            : ['Aucun'];
+
+        const exDataValues = (exchangeCounts && exchangeCounts.length > 0)
+            ? exchangeCounts.map(r => parseInt(r.count, 10))
+            : [0];
+
+        const ctxEx = document.getElementById('exchangesChart').getContext('2d');
+        const gradientEx = ctxEx.createLinearGradient(0, 0, 0, 400);
+        gradientEx.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+        gradientEx.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+
+        const exchangesChart = new Chart(ctxEx, {
+            type: 'line',
+            data: {
+                labels: exLabels,
+                datasets: [{
+                    label: 'Échanges acceptés par jour',
+                    data: exDataValues,
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    backgroundColor: gradientEx,
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { display: true },
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: function (context) { return `${context.parsed.y} échange${context.parsed.y > 1 ? 's' : ''}`; } } }
                 }
             }
         });
