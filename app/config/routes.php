@@ -17,11 +17,24 @@ ini_set('display_startup_errors', 1);
  */
 
 $router->group('', function (Router $router) use ($app) {
+    $router->get('/', function () use ($app) {
+        $app->render('register', ['ls_donnees_prod' => 'a']);
+    });
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
         $statsParJour = UserController::StatsRegister($user);
+        $registerCounts = [];
+
+        try {
+            $registerCounts = $user->getRegistrationsPerDay();
+            error_log("registerCounts: " . print_r($registerCounts, true));
+        } catch (\Throwable $e) {
+            error_log('Erreur getRegistrationsPerDay: ' . $e->getMessage());
+        }
+
         $app->render('AdminStats', [
-            'statsParJour' => $statsParJour
+            'statsParJour' => $statsParJour,
+            'registerCounts' => $registerCounts,
         ]);
     });
     $router->get('/register', function () use ($app) {
@@ -68,12 +81,12 @@ $router->group('', function (Router $router) use ($app) {
             $image_objet = new Image_objet();
             $images_par_objet = [];
             foreach ($objets as &$objet) {
-                $images = $image_objet->get_image_by_objet($objet['id']);
+                $images = $image_objet->get_image_by_objet($objet['id_objet']);
 
                 if ($images) {
-                    $images_par_objet[$objet['id']] = $images;
+                    $images_par_objet[$objet['id_objet']] = $images;
                 } else {
-                    $images_par_objet[$objet['id']] = [];
+                    $images_par_objet[$objet['id_objet']] = [];
                 }
             }
             $app->render('accueil', ['user_data' => $user_data, 'objets' => $objets, 'images_par_objet' => $images_par_objet]);
