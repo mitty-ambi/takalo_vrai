@@ -56,6 +56,46 @@
                 </tbody>
             </table>
         </div>
+        <div>
+            <h3 style="margin-top:18px">Liste des utilisateurs</h3>
+            <table class="user-list">
+                <thead>
+                    <tr>
+                        <th>id user</th>
+                        <th>nom</th>
+                        <th>prenom</th>
+                        <th>email</th>
+                        <th>type d'utilisateur</th>
+                        <th>Date creation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($statsParJour as $stats) { ?>
+                        <tr>
+                            <td>
+                                <?= htmlspecialchars($stats['id_user']) ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($stats['nom']) ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($stats['prenom']) ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($stats['email']) ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($stats['type_user']) ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($stats['date_creation']) ?>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script nonce="<?= Flight::app()->get('csp_nonce') ?>">
