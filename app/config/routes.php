@@ -1,4 +1,5 @@
 <?php
+use app\controllers\CategorieController;
 use app\controllers\UserController;
 use app\controllers\ObjectController;
 use app\controllers\ExchangeController;
@@ -11,6 +12,7 @@ use app\models\Image_objet;
 use app\models\Categorie;
 use app\models\Echange;
 use app\models\EchangeFille;
+use app\models\EchangeMere;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -21,11 +23,45 @@ ini_set('display_startup_errors', 1);
  */
 
 $router->group('', function (Router $router) use ($app) {
+    $router->get('/', function () use ($app) {
+        $app->render('register', ['ls_donnees_prod' => 'a']);
+    });
+    $router->get('/search', function () use ($app) {
+        $listeCat = CategorieController::getAll();
+        $app->render('Search', ['listeCat' => $listeCat]);
+    });
+    $router->post('/api/search', function () use ($app) {
+        
+    });
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
         $statsParJour = UserController::StatsRegister($user);
+        $registerCounts = [];
+        $exchangeCounts = [];
+        $allExchanges = [];
+        $countExchange = EchangeMere::getCountExchange();
+        try {
+            $registerCounts = $user->getRegistrationsPerDay();
+            error_log("registerCounts: " . print_r($registerCounts, true));
+        } catch (\Throwable $e) {
+            error_log('Erreur getRegistrationsPerDay: ' . $e->getMessage());
+        }
+
+        try {
+            $echange = new EchangeMere(null, null, null, null, null, null);
+            $exchangeCounts = $echange->getExchangesPerDay();
+            $allExchanges = $echange->getAllEchange();
+            error_log("exchangeCounts: " . print_r($exchangeCounts, true));
+        } catch (\Throwable $e) {
+            error_log('Erreur getExchangesPerDay: ' . $e->getMessage());
+        }
+
         $app->render('AdminStats', [
-            'statsParJour' => $statsParJour
+            'statsParJour' => $statsParJour,
+            'registerCounts' => $registerCounts,
+            'exchangeCounts' => $exchangeCounts,
+            'allExchanges' => $allExchanges,
+            'totalEchange' => $countExchange
         ]);
     });
     $router->get('/register', function () use ($app) {
@@ -72,12 +108,12 @@ $router->group('', function (Router $router) use ($app) {
             $image_objet = new Image_objet();
             $images_par_objet = [];
             foreach ($objets as &$objet) {
-                $images = $image_objet->get_image_by_objet($objet['id']);
+                $images = $image_objet->get_image_by_objet($objet['id_objet']);
 
                 if ($images) {
-                    $images_par_objet[$objet['id']] = $images;
+                    $images_par_objet[$objet['id_objet']] = $images;
                 } else {
-                    $images_par_objet[$objet['id']] = [];
+                    $images_par_objet[$objet['id_objet']] = [];
                 }
             }
             $app->render('accueil', ['user_data' => $user_data, 'objets' => $objets, 'images_par_objet' => $images_par_objet]);

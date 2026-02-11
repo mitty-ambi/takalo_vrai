@@ -3,6 +3,8 @@
 namespace app\models;
 
 use PDO;
+namespace app\models;
+use Flight;
 
 class EchangeFille
 {
@@ -13,6 +15,7 @@ class EchangeFille
     public $id_proprietaire;
 
     public function __construct($id_echange_fille = null, $id_echange_mere = null, $id_objet = null, $quantite = 1, $id_proprietaire = null)
+    public function __construct($id_echange_fille, $id_echange_mere, $id_objet, $quantite, $id_proprietaire)
     {
         $this->id_echange_fille = $id_echange_fille;
         $this->id_echange_mere = $id_echange_mere;
@@ -75,3 +78,15 @@ class EchangeFille
     }
 }
 ?>
+    public function getAllEchangeFille()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare('SELECT * FROM Echange_fille');
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
+}

@@ -174,6 +174,36 @@ class Objet
         $stmt1->bindValue(':id_objet', (int) $id_objet_1, \PDO::PARAM_INT);
         $stmt->execute();
         $stmt1->execute();
+    public static function search($keyword = null, $categorie_id = null)
+    {
+        $DBH = \Flight::db();
+
+        $conditions = [];
+        $params = [];
+        $sql = "SELECT o.*, c.nom_categorie
+            FROM Objet o
+            JOIN Categorie c ON o.id_categorie = c.id_categorie ";
+
+        if (!empty($keyword)) {
+            $conditions[] = "o.nom_objet LIKE ?";
+            $params[] = "%$keyword%";
+        }
+
+        if (!empty($categorie_id)) {
+            $conditions[] = "o.id_categorie = ?";
+            $params[] = $categorie_id;
+        }
+
+        $where = "";
+        if (!empty($conditions)) {
+            $where = "WHERE " . implode(" AND ", $conditions);
+        }
+        $sql += $where;
+
+        $stmt = $DBH->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
 ?>
