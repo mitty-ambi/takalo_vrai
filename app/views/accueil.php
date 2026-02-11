@@ -16,24 +16,22 @@
         <div class="header-content">
             <div>
                 <h1 class="header-title">Takalo Vrai</h1>
-                <p class="header-subtitle">Bienvenue, <?= htmlspecialchars($user_data['prenom'] ?? 'Utilisateur'); ?> 👋
+                <p class="header-subtitle">Bienvenue, <?= htmlspecialchars($donnees_utilisateur['prenom'] ?? 'Utilisateur'); ?> 👋
                 </p>
             </div>
             <div class="user-info">
                 <div class="user-avatar">
-                    <?= strtoupper(substr($user_data['prenom'] ?? 'U', 0, 1)); ?>
+                    <?= strtoupper(substr($donnees_utilisateur['prenom'] ?? 'U', 0, 1)); ?>
                 </div>
                 <div class="user-name">
-                    <?= htmlspecialchars($user_data['nom'] ?? 'Utilisateur'); ?>
+                    <?= htmlspecialchars($donnees_utilisateur['nom'] ?? 'Utilisateur'); ?>
                 </div>
             </div>
         </div>
     </header>
     <?php include __DIR__ . '/components/side_nav.php'; ?>
 
-    <!-- Main Content -->
     <main class="dashboard-container">
-        <!-- Section Title with Action Buttons -->
         <div
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <h2 class="section-title" style="margin-bottom: 0; flex: 1; min-width: 200px;">Mes Objets en Échange</h2>
@@ -43,12 +41,10 @@
             </div>
         </div>
 
-        <!-- Objects Grid -->
         <?php if (count($objets) > 0): ?>
             <div class="objets-grid">
                 <?php foreach ($objets as $objet): ?>
                     <div class="objet-card">
-                        <!-- Image -->
                         <div class="objet-image-container">
                             <?php if (isset($images_par_objet[$objet['id_objet']]) && count($images_par_objet[$objet['id_objet']]) > 0): ?>
                                 <img src="<?= htmlspecialchars($images_par_objet[$objet['id_objet']][0]['url_image']); ?>"

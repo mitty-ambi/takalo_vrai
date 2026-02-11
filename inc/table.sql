@@ -24,6 +24,7 @@ CREATE TABLE Objet (
     id_user INT NOT NULL,
     date_acquisition DATE,
     prix_estime DECIMAL(10,2),
+    description TEXT,
     FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie) ON DELETE CASCADE,
     FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user) ON DELETE CASCADE
 );
@@ -35,6 +36,8 @@ CREATE TABLE Image_objet (
     FOREIGN KEY (id_objet) REFERENCES Objet(id_objet) ON DELETE CASCADE
 );
 
+ALTER TABLE Objet ADD COLUMN description TEXT;
+
 CREATE TABLE Echange(
     id_echange INT PRIMARY KEY AUTO_INCREMENT,
     id_user_1 INT NOT NULL,
@@ -43,8 +46,7 @@ CREATE TABLE Echange(
     date_finalisation DATE,
     statut VARCHAR(20) DEFAULT 'en attente',
     FOREIGN KEY (id_user_1) REFERENCES Utilisateur(id_user) ON DELETE CASCADE,
-    FOREIGN KEY (id_user_2) REFERENCES Utilisateur(id_user) ON DELETE CASCADE,
-    CONSTRAINT chk_users_different CHECK (id_user_1 <> id_user_2)
+    FOREIGN KEY (id_user_2) REFERENCES Utilisateur(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE Echange_fille(
