@@ -1,4 +1,5 @@
 <?php
+use app\controllers\CategorieController;
 use app\controllers\UserController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
@@ -21,13 +22,20 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
     });
+    $router->get('/search', function () use ($app) {
+        $listeCat = CategorieController::getAll();
+        $app->render('Search', ['listeCat' => $listeCat]);
+    });
+    $router->post('/api/search', function () use ($app) {
+        
+    });
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
         $statsParJour = UserController::StatsRegister($user);
         $registerCounts = [];
         $exchangeCounts = [];
         $allExchanges = [];
-
+        $countExchange = EchangeMere::getCountExchange();
         try {
             $registerCounts = $user->getRegistrationsPerDay();
             error_log("registerCounts: " . print_r($registerCounts, true));
@@ -49,6 +57,7 @@ $router->group('', function (Router $router) use ($app) {
             'registerCounts' => $registerCounts,
             'exchangeCounts' => $exchangeCounts,
             'allExchanges' => $allExchanges,
+            'totalEchange' => $countExchange
         ]);
     });
     $router->get('/register', function () use ($app) {

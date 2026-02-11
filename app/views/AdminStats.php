@@ -30,8 +30,8 @@ use app\models\User;
         <div class="chart-card" style="margin-top:18px">
             <div class="chart-header">
                 <h2>Échanges effectués par jour</h2>
-                <div class="small-muted">Total échanges acceptés : <span
-                        class="stat-bubble"><?= count($exchangeCounts ?? []) ?></span></div>
+                <div class="small-muted">Total échanges acceptés : <span class="stat-bubble"><?= $totalEchange ?></span>
+                </div>
             </div>
             <canvas id="exchangesChart" height="120"></canvas>
         </div>
