@@ -1,4 +1,5 @@
 <?php
+use app\controllers\UserController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
@@ -16,8 +17,12 @@ ini_set('display_startup_errors', 1);
  */
 
 $router->group('', function (Router $router) use ($app) {
-    $router->get('/register', function () use ($app) {
-        $app->render('register', ['ls_donnees_prod' => 'a']);
+    $router->get('/AdminStats', function () use ($app) {
+        $user = new User(null, null, null, null, null);
+        $statsParJour = UserController::StatsRegister($user);
+        $app->render('AdminStats', [
+            'statsParJour' => $statsParJour
+        ]);
     });
     $router->get('/register', function () use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
