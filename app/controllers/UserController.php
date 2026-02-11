@@ -23,7 +23,7 @@ class UserController
         $stats = UserController::StatsRegister($user);
         foreach ($stats as $s) {
             if ($date === $s['date_creation']) {
-
+                
             }
         }
     }
