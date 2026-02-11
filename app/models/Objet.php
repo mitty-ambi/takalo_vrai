@@ -161,7 +161,8 @@ class Objet
             return false;
         }
     }
-    public static function switch_proprietaires_objets($id_user_1, $id_user_2, $id_objet_1, $id_objet_2){
+    public static function switch_proprietaires_objets($id_user_1, $id_user_2, $id_objet_1, $id_objet_2)
+    {
         $DBH = \Flight::db();
         $query = "UPDATE Objet set id_user = :id_user where id_objet = :id_objet";
         $query1 = "UPDATE Objet set id_user = :id_user where id_objet = :id_objet";
@@ -174,6 +175,7 @@ class Objet
         $stmt1->bindValue(':id_objet', (int) $id_objet_1, \PDO::PARAM_INT);
         $stmt->execute();
         $stmt1->execute();
+    }
     public static function search($keyword = null, $categorie_id = null)
     {
         $DBH = \Flight::db();
