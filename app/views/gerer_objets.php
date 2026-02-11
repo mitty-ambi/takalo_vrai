@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gérer mes objets - Takalo Vrai</title>
     <link rel="stylesheet" href="/assets/css/sidebar.css">
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/gerer_objets.css">
-    
+    <link rel="stylesheet" href="/assets/css/gerer_objets.css">y
+
 </head>
+
 <body>
     <header class="dashboard-header">
         <div class="header-content">
@@ -43,20 +44,21 @@
             <div class="objets-container">
                 <?php foreach ($objets as $objet): ?>
                     <div class="objet-card">
-                        <?php 
+                        <?php
                         $images = $images_objet[$objet['id_objet']] ?? [];
                         $image_src = !empty($images) ? htmlspecialchars($images[0]['url_image']) : '/assets/images/no-image.png';
                         ?>
                         <img src="<?= $image_src; ?>" alt="<?= htmlspecialchars($objet['nom_objet']); ?>" class="objet-image">
-                        
+
                         <div class="objet-content">
                             <div class="objet-title"><?= htmlspecialchars($objet['nom_objet']); ?></div>
                             <div class="objet-description"><?= htmlspecialchars($objet['description'] ?? ''); ?></div>
                             <div class="objet-price"><?= htmlspecialchars($objet['prix_estime']); ?> Ar</div>
-                            
+
                             <div class="objet-actions">
                                 <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-edit">✏️ Éditer</a>
-                                <a href="/supprimer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-delete" onclick="return confirm('Êtes-vous sûr ?');">🗑️ Supprimer</a>
+                                <a href="/supprimer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-delete"
+                                    onclick="return confirm('Êtes-vous sûr ?');">🗑️ Supprimer</a>
                                 <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-photo">📷 Photos</a>
                             </div>
                         </div>
@@ -74,7 +76,5 @@
 
     <?php include __DIR__ . '/components/footer.php'; ?>
 </body>
+
 </html>
-
-
-

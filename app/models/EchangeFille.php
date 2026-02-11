@@ -43,7 +43,7 @@ class EchangeFille
     public static function get_by_echange($id_echange)
     {
         $DBH = \Flight::db();
-        $query = "SELECT ef.*, o.nom_objet, o.prix_estime, u.nom, u.prenom 
+        $query = "SELECT ef.*, o.nom_objet, o.prix_estime, u.nom, u.prenom
                   FROM Echange_fille ef
                   JOIN Objet o ON ef.id_objet = o.id_objet
                   JOIN Utilisateur u ON ef.id_proprietaire = u.id_user
