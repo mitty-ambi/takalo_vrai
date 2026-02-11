@@ -27,6 +27,7 @@ use app\models\User;
                     <li class="mt-2"><a href="/AdminCat" class="auth-link">Catégorie</a></li>
                     <li class="mt-2"><a href="/AdminStats" class="auth-link">Statistiques</a></li>
                 <?php } ?>
+                <li class="mb-2"><a href="/search" class="auth-link">Recherche</a></li>
                 <li class="mb-2"><a href="/register" class="auth-link">S'inscrire</a></li>
                 <li class="mb-2"><a href="/login" class="auth-link active">Se connecter</a></li>
                 <li class="mb-2"><a href="/help" class="auth-link">Aide & support</a></li>

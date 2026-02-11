@@ -47,4 +47,15 @@ class EchangeMere
         }
         return $data;
     }
+    public static function getCountExchange()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT count(*) as totalEchange FROM Echange WHERE statut = 'accepte'");
+        $sql->execute();
+        $count = $sql->fetch(\PDO::FETCH_ASSOC);
+        if ($count) {
+            return $count['totalEchange'];
+        }
+        return 0;
+    }
 }

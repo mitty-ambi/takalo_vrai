@@ -1,0 +1,208 @@
+/* ==================== SEARCH STYLES ==================== */
+
+/* Container principal - centrage */
+.dashboard-container {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    max-width: 1200px;
+    /* Limite la largeur max */
+    margin-right: auto;
+    /* Centre le contenu */
+    padding: 0 2rem 3rem;
+}
+
+/* Header aussi centré */
+.dashboard-header {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding-left: calc((100% - 1200px) / 2);
+    /* Centre le contenu du header */
+    padding-right: calc((100% - 1200px) / 2);
+}
+
+/* Section de recherche - centrée */
+.search-section {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin: 2rem auto 2rem;
+    /* Centre horizontalement */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+/* Formulaire centré */
+.search-form {
+    margin-top: 1.5rem;
+    max-width: 900px;
+    /* Limite la largeur du formulaire */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Grille de recherche équilibrée */
+.search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.5fr;
+    /* Ajusté pour centrer */
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+/* Champ de recherche */
+.search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Bouton de recherche centré */
+.search-button-field {
+    display: flex;
+    justify-content: center;
+    /* Centre le bouton */
+}
+
+.btn-search {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    min-width: 140px;
+    white-space: nowrap;
+}
+
+/* Résultats - centrés */
+.results-section {
+    margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Grille d'objets - centrée */
+.objets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 0 auto 3rem;
+    width: 100%;
+}
+
+/* Empty state centré */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    max-width: 600px;
+    margin: 2rem auto;
+    /* Centre l'empty state */
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1200px) {
+
+    .dashboard-container,
+    .results-section {
+        max-width: 95%;
+    }
+
+    .dashboard-header {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-container {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1.5rem 2rem;
+    }
+
+    .dashboard-header {
+        margin-left: 0;
+        width: 100%;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .search-grid {
+        grid-template-columns: 1fr;
+        /* Passe en colonne sur tablette */
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .search-section {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-section {
+        padding: 1.25rem;
+    }
+
+    .btn-search {
+        width: 100%;
+    }
+
+    .objets-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1.5rem;
+        margin: 1.5rem;
+    }
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.objet-card {
+    animation: fadeIn 0.5s ease;
+}
+
+.objet-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.objet-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.objet-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.objet-card:nth-child(n+4) {
+    animation-delay: 0.4s;
+}
