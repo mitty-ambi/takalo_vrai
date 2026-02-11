@@ -13,5 +13,19 @@ class UserController
     {
         $user->insert_user();
     }
+    public static function StatsRegister($user)
+    {
+        return $user->StatsRegister();
+    }
+    public static function userRegistered($date)
+    {
+        $user = new User(null, null, null, null, null); 
+        $stats = UserController::StatsRegister($user);
+        foreach ($stats as $s) {
+            if ($date === $s['date_creation']) {
+                
+            }
+        }
+    }
 }
 ?>

@@ -21,7 +21,17 @@ class User
         $this->mdp_hash = $mdp_hash;
         $this->type_user = $type_user;
     }
-
+    public function StatsRegister()
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare('SELECT * FROM Utilisateur GROUP BY date_creation,id_user');
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
     public function insert_user()
     {
         try {
