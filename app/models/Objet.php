@@ -219,8 +219,9 @@ class Objet
         }
         public static function history(int $id_objet)
         {
+            $allo = 0;
             $DBH = \Flight::db();
-            $sql = "
+            $sql = "     
                 SELECT
                     ef.id_echange_fille,
                     ef.id_echange_mere,
