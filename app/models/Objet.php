@@ -175,53 +175,49 @@ class Objet
         $stmt1->bindValue(':id_objet', (int) $id_objet_1, \PDO::PARAM_INT);
         $stmt->execute();
         $stmt1->execute();
-        } // <-- ajouter cette accolade pour fermer la méthode précédente
-    }
+    } // <-- ajouter cette accolade pour fermer la méthode précédente
+
     public static function search($keyword = null, $categorie_id = null)
     {
         $DBH = \Flight::db();
 
-        public static function search($keyword = null, $categorie_id = null)
-        {
-            $DBH = \Flight::db();
-
-            $conditions = [];
-            $params = [];
-            $sql = "SELECT o.*, c.nom_categorie
+        $conditions = [];
+        $params = [];
+        $sql = "SELECT o.*, c.nom_categorie
                 FROM Objet o
                 JOIN Categorie c ON o.id_categorie = c.id_categorie ";
 
-            if (!empty($keyword)) {
-                $conditions[] = "o.nom_objet LIKE ?";
-                $params[] = "%$keyword%";
-            }
+        if (!empty($keyword)) {
+            $conditions[] = "o.nom_objet LIKE ?";
+            $params[] = "%$keyword%";
+        }
 
-            if (!empty($categorie_id)) {
-                $conditions[] = "o.id_categorie = ?";
-                $params[] = $categorie_id;
-            }
+        if (!empty($categorie_id)) {
+            $conditions[] = "o.id_categorie = ?";
+            $params[] = $categorie_id;
+        }
 
-            $where = "";
-            if (!empty($conditions)) {
-                $where = "WHERE " . implode(" AND ", $conditions);
-            }
-            $sql += $where;
+        $where = "";
+        if (!empty($conditions)) {
+            $where = "WHERE " . implode(" AND ", $conditions);
+        }
+        $sql += $where;
         $where = "";
         if (!empty($conditions)) {
             $where = "WHERE " . implode(" AND ", $conditions);
         }
         $sql .= $where;
 
-            $stmt = $DBH->prepare($sql);
-            $stmt->execute($params);
+        $stmt = $DBH->prepare($sql);
+        $stmt->execute($params);
 
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        }
-        public static function history(int $id_objet)
-        {
-            $allo = 0;
-            $DBH = \Flight::db();
-            $sql = "     
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    public static function history(int $id_objet)
+    {
+        $allo = 0;
+        $DBH = \Flight::db();
+        $sql = "     
                 SELECT
                     ef.id_echange_fille,
                     ef.id_echange_mere,
@@ -235,10 +231,10 @@ class Objet
                 WHERE ef.id_objet = :id_objet
                 ORDER BY date_echange ASC, ef.id_echange_fille ASC
             ";
-            $stmt = $DBH->prepare($sql);
-            $stmt->bindValue(':id_objet', $id_objet, \PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        }
+        $stmt = $DBH->prepare($sql);
+        $stmt->bindValue(':id_objet', $id_objet, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+}
 ?>
