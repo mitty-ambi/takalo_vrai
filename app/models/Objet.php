@@ -176,6 +176,7 @@ class Objet
         $stmt->execute();
         $stmt1->execute();
     }
+
     public static function search($keyword = null, $categorie_id = null)
     {
         $DBH = \Flight::db();
@@ -207,5 +208,27 @@ class Objet
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public static function history(int $id_objet)
+    {
+        $DBH = \Flight::db();
+        $sql = "
+                SELECT
+                    ef.id_echange_fille,
+                    ef.id_echange_mere,
+                    COALESCE(e.date_finalisation, e.date_demande) AS date_echange,
+                    ef.id_proprietaire,
+                    u.nom,
+                    u.prenom
+                FROM Echange_fille ef
+                JOIN Echange e ON ef.id_echange_mere = e.id_echange
+                JOIN Utilisateur u ON ef.id_proprietaire = u.id_user
+                WHERE ef.id_objet = :id_objet
+                ORDER BY date_echange ASC, ef.id_echange_fille ASC
+            ";
+        $stmt = $DBH->prepare($sql);
+        $stmt->bindValue(':id_objet', $id_objet, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
-?>
