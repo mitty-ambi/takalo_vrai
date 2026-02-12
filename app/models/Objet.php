@@ -175,7 +175,11 @@ class Objet
         $stmt1->bindValue(':id_objet', (int) $id_objet_1, \PDO::PARAM_INT);
         $stmt->execute();
         $stmt1->execute();
+<<<<<<< Updated upstream
     }
+=======
+    } // <-- ajouter cette accolade pour fermer la méthode précédente
+>>>>>>> Stashed changes
 
     public static function search($keyword = null, $categorie_id = null)
     {
@@ -184,8 +188,23 @@ class Objet
         $conditions = [];
         $params = [];
         $sql = "SELECT o.*, c.nom_categorie
+<<<<<<< Updated upstream
             FROM Objet o
             JOIN Categorie c ON o.id_categorie = c.id_categorie ";
+
+        if (!empty($keyword)) {
+            $conditions[] = "o.nom_objet LIKE ?";
+            $params[] = "%$keyword%";
+        }
+
+        if (!empty($categorie_id)) {
+            $conditions[] = "o.id_categorie = ?";
+            $params[] = $categorie_id;
+        }
+
+=======
+                FROM Objet o
+                JOIN Categorie c ON o.id_categorie = c.id_categorie ";
 
         if (!empty($keyword)) {
             $conditions[] = "o.nom_objet LIKE ?";
@@ -201,6 +220,12 @@ class Objet
         if (!empty($conditions)) {
             $where = "WHERE " . implode(" AND ", $conditions);
         }
+        $sql += $where;
+>>>>>>> Stashed changes
+        $where = "";
+        if (!empty($conditions)) {
+            $where = "WHERE " . implode(" AND ", $conditions);
+        }
         $sql .= $where;
 
         $stmt = $DBH->prepare($sql);
@@ -208,7 +233,10 @@ class Objet
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     public static function history(int $id_objet)
     {
         $DBH = \Flight::db();
@@ -231,4 +259,10 @@ class Objet
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+
+?>
+>>>>>>> Stashed changes
