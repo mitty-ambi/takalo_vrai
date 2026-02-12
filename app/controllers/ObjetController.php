@@ -1,7 +1,9 @@
 <?php
 namespace app\controllers;
-use app\models\Objet;
+use app\models\Categorie;
+use app\models\User;
 use app\models\Users;
+use app\models\Objet;
 
 class ObjetController
 {

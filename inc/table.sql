@@ -29,7 +29,8 @@ CREATE TABLE Objet (
     FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user) ON DELETE CASCADE
 );
 
-CREATE TABLE Image_objet(
+ALTER TABLE Objet ADD description TEXT;
+CREATE TABLE Image_objet (
     id_image INT PRIMARY KEY AUTO_INCREMENT,
     id_objet INT NOT NULL,
     url_image VARCHAR(255) NOT NULL,

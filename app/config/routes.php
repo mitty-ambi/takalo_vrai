@@ -1,4 +1,5 @@
 <?php
+use app\controllers\ObjetController;
 use app\controllers\CategorieController;
 use app\controllers\UserController;
 use app\controllers\ObjectController;
@@ -30,8 +31,30 @@ $router->group('', function (Router $router) use ($app) {
         $listeCat = CategorieController::getAll();
         $app->render('Search', ['listeCat' => $listeCat]);
     });
-    $router->post('/api/search', function () use ($app) {
-        
+    $router->post('/search/results', function () use ($app) {
+        $keyword = $_POST['keyword'] ?? null;
+        $categorie_id = $_POST['categorie'] ?? null;
+
+        $objets = ObjetController::search($keyword, $categorie_id);
+        $listeCat = CategorieController::getAll();
+        $images_par_objet = [];
+        try {
+            $imageModel = new Image_objet();
+            if (is_array($objets)) {
+                foreach ($objets as $objet) {
+                    $images = $imageModel->get_image_by_objet($objet['id_objet']);
+                    $images_par_objet[$objet['id_objet']] = $images ?: [];
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log('Erreur récupération images search: ' . $e->getMessage());
+        }
+
+        $app->render('Search', [
+            'listeCat' => $listeCat,
+            'objets' => $objets,
+            'images_objet' => $images_par_objet,
+        ]);
     });
     $router->get('/AdminStats', function () use ($app) {
         $user = new User(null, null, null, null, null);
@@ -93,6 +116,10 @@ $router->group('', function (Router $router) use ($app) {
         $app->redirect('/AdminCat');
     });
     $router->get('/login', function () use ($app) {
+        $app->render('login', ['connected' => '1']);
+    });
+    $router->get('/logout', function () use ($app) {
+        session_destroy();
         $app->render('login', ['connected' => '1']);
     });
     $router->get('/AdminCat', function () use ($app) {
@@ -265,13 +292,13 @@ $router->group('', function (Router $router) use ($app) {
         }
         $user_data = $_SESSION['user_data'] ?? [];
         $objets = ObjectController::get_user_objects($_SESSION['id_user']);
-        
+
         $objet_images = [];
         foreach ($objets as $objet) {
             $images = ObjectController::get_object_images($objet['id_objet']);
             $objet_images[$objet['id_objet']] = $images ?: [];
         }
-        error_log(print_r($objet_images, true)); 
+        error_log(print_r($objet_images, true));
         $app->render('gerer_objets', [
             'donnees_utilisateur' => $user_data,
             'objets' => $objets,
@@ -283,15 +310,15 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $nom_objet = $_POST['nom_objet'] ?? '';
         $description = $_POST['description'] ?? '';
         $id_categorie = $_POST['id_categorie'] ?? '';
         $prix_estime = $_POST['prix_estime'] ?? '';
         $date_acquisition = $_POST['date_acquisition'] ?? null;
-        
+
         error_log('[DEBUG] ID Catégorie reçu: ' . $id_categorie);
-        
+
         if ($nom_objet && $id_categorie && $prix_estime) {
             $id_objet = ObjectController::create_object(
                 $nom_objet,
@@ -301,9 +328,9 @@ $router->group('', function (Router $router) use ($app) {
                 $prix_estime,
                 $date_acquisition
             );
-            
+
             error_log('[DEBUG] ID Objet créé: ' . $id_objet);
-            
+
             if ($id_objet) {
                 if (isset($_FILES['images'])) {
                     foreach ($_FILES['images']['tmp_name'] as $tmp_name) {
@@ -317,7 +344,7 @@ $router->group('', function (Router $router) use ($app) {
                     }
                 }
             }
-            
+
             $app->redirect('/gerer-objets');
         } else {
             $app->redirect('/ajouter-objet');
@@ -328,20 +355,20 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_objet = $_GET['id'] ?? null;
         if (!$id_objet) {
             $app->redirect('/gerer-objets');
         }
-        
+
         $objet = ObjectController::get_object_by_id($id_objet);
         if (!$objet || $objet['id_user'] !== $_SESSION['id_user']) {
             $app->redirect('/gerer-objets');
         }
-        
+
         $categories = Categorie::get_all_categories();
         $images = ObjectController::get_object_images($id_objet);
-        
+
         $app->render('editer_objet', [
             'donnees_utilisateur' => $_SESSION['user_data'] ?? [],
             'objet' => $objet,
@@ -354,13 +381,13 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_objet = $_POST['id_objet'] ?? null;
         $nom_objet = $_POST['nom_objet'] ?? '';
         $description = $_POST['description'] ?? '';
         $id_categorie = $_POST['id_categorie'] ?? '';
         $prix_estime = $_POST['prix_estime'] ?? '';
-        
+
         if ($id_objet && ObjectController::update_object($id_objet, $nom_objet, $id_categorie, $description, $prix_estime)) {
             if (isset($_FILES['images'])) {
                 foreach ($_FILES['images']['tmp_name'] as $tmp_name) {
@@ -383,7 +410,7 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_objet = $_GET['id'] ?? null;
         if ($id_objet && ObjectController::delete_object($id_objet)) {
             $app->redirect('/gerer-objets');
@@ -394,21 +421,21 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $user_data = $_SESSION['user_data'] ?? [];
         $objets = ObjectController::get_other_users_objects($_SESSION['id_user']);
-        
+
         $objet_images = [];
         $user_names = [];
         foreach ($objets as $objet) {
             $images = ObjectController::get_object_images($objet['id_objet']);
             $objet_images[$objet['id_objet']] = $images ?: [];
-            
+
             if (!isset($user_names[$objet['id_user']])) {
                 $user_names[$objet['id_user']] = User::get_user_by_id_static($objet['id_user']);
             }
         }
-        
+
         $app->render('parcourir_objets', [
             'donnees_utilisateur' => $user_data,
             'objets' => $objets,
@@ -421,34 +448,34 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_objet = $_GET['id'] ?? null;
         if (!$id_objet) {
             $app->redirect('/parcourir');
         }
-        
+
         $objet = ObjectController::get_object_by_id($id_objet);
         if (!$objet) {
             $app->redirect('/parcourir');
         }
-        
+
         // Vérifier que l'objet n'appartient pas à l'utilisateur connecté
         if ($objet['id_user'] === $_SESSION['id_user']) {
             $app->redirect('/gerer-objets');
         }
-        
+
         $owner = User::get_user_by_id_static($objet['id_user']);
-        
+
         $images = ObjectController::get_object_images($id_objet);
-        
+
         $DBH = \Flight::db();
         $stmt = $DBH->prepare('SELECT nom_categorie FROM Categorie WHERE id_categorie = ?');
         $stmt->execute([$objet['id_categorie']]);
         $category = $stmt->fetch(\PDO::FETCH_ASSOC);
         $category_name = $category['nom_categorie'] ?? '';
-        
+
         $my_objects = ObjectController::get_user_objects($_SESSION['id_user']) ?: [];
-        
+
         $app->render('detail_objet', [
             'donnees_utilisateur' => $_SESSION['user_data'] ?? [],
             'objet' => $objet,
@@ -463,57 +490,57 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_objet_sender = $_POST['id_objet_sender'] ?? null;
         $id_objet_receiver = $_POST['id_objet_receiver'] ?? null;
-        
+
         if (!$id_objet_sender || !$id_objet_receiver) {
             $app->redirect('/detail-objet?id=' . $id_objet_receiver);
         }
-        
+
         $objet_sender = ObjectController::get_object_by_id($id_objet_sender);
         if (!$objet_sender || $objet_sender['id_user'] !== $_SESSION['id_user']) {
             error_log('[ERROR] User ' . $_SESSION['id_user'] . ' tried to send object ' . $id_objet_sender . ' they do not own');
             $app->redirect('/parcourir');
         }
-        
+
         $objet_receiver = ObjectController::get_object_by_id($id_objet_receiver);
         if (!$objet_receiver || $objet_receiver['id_user'] === $_SESSION['id_user']) {
             error_log('[ERROR] User ' . $_SESSION['id_user'] . ' tried to exchange with themselves');
             $app->redirect('/parcourir');
         }
-        
+
         $id_user_2 = $objet_receiver['id_user'];
-        
+
         $id_echange = ExchangeController::create_exchange($_SESSION['id_user'], $id_user_2);
-        
+
         if ($id_echange) {
             ExchangeController::add_object_to_exchange($id_echange, $id_objet_sender, $_SESSION['id_user']);
             ExchangeController::add_object_to_exchange($id_echange, $id_objet_receiver, $id_user_2);
         }
-        
+
         $app->redirect('/gerer-echanges');
     });
     $router->get('/gerer-echanges', function () use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $user_data = $_SESSION['user_data'] ?? [];
-        
+
         $received_exchanges = ExchangeController::get_pending_received_exchanges($_SESSION['id_user']) ?: [];
         $sent_exchanges = ExchangeController::get_pending_sent_exchanges($_SESSION['id_user']) ?: [];
         $all_exchanges = ExchangeController::get_user_exchanges($_SESSION['id_user']) ?: [];
-        
-        $history_exchanges = array_filter($all_exchanges, function($e) {
+
+        $history_exchanges = array_filter($all_exchanges, function ($e) {
             return $e['statut'] !== 'en attente';
         });
-        
+
         $senders = [];
         $receivers = [];
         $exchange_items = [];
         $all_users = [];
-        
+
         foreach (array_merge($received_exchanges, $sent_exchanges, $history_exchanges) as $exchange) {
             if (!isset($senders[$exchange['id_user_1']])) {
                 $senders[$exchange['id_user_1']] = User::get_user_by_id_static($exchange['id_user_1']);
@@ -527,18 +554,18 @@ $router->group('', function (Router $router) use ($app) {
             if (!isset($all_users[$exchange['id_user_2']])) {
                 $all_users[$exchange['id_user_2']] = User::get_user_by_id_static($exchange['id_user_2']);
             }
-            
+
             $items = ExchangeController::get_exchange_objects($exchange['id_echange']);
             $exchange_items[$exchange['id_echange']] = [
-                'sender' => array_filter($items, function($item) use ($exchange) {
+                'sender' => array_filter($items, function ($item) use ($exchange) {
                     return $item['id_proprietaire'] == $exchange['id_user_1'];
                 }),
-                'receiver' => array_filter($items, function($item) use ($exchange) {
+                'receiver' => array_filter($items, function ($item) use ($exchange) {
                     return $item['id_proprietaire'] == $exchange['id_user_2'];
                 })
             ];
         }
-        
+
         $app->render('gerer_echanges', [
             'donnees_utilisateur' => $user_data,
             'echanges_recus' => $received_exchanges,
@@ -555,12 +582,15 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
         $id_echange = $_GET['id'] ?? null;
+        echo $id_echange;
         error_log('[DEBUG] /accepter-echange called with id: ' . $id_echange);
         $donnees = Echangefille::get_by_echange($id_echange);
         $user_1 = $donnees[0]['id_proprietaire'];
         $user_2 = $donnees[1]['id_proprietaire'];
+        $user_1 = $donnees[0]['id_proprietaire'];
+        $user_2 = $donnees[1]['id_proprietaire'];
+
 
         $objet_1 = $donnees[0]['id_objet'];
         $objet_2 = $donnees[1]['id_objet'];
@@ -568,7 +598,7 @@ $router->group('', function (Router $router) use ($app) {
             $result = ExchangeController::accept_exchange($id_echange, $user_1, $user_2, $objet_1, $objet_2);
             error_log('[DEBUG] accept_exchange returned: ' . ($result ? 'true' : 'false'));
         }
-        
+
         $app->redirect('/gerer-echanges');
     });
 
@@ -576,14 +606,14 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_echange = $_GET['id'] ?? null;
         error_log('[DEBUG] /refuser-echange called with id: ' . $id_echange);
         if ($id_echange) {
             $result = ExchangeController::refuse_exchange($id_echange);
             error_log('[DEBUG] refuse_exchange returned: ' . ($result ? 'true' : 'false'));
         }
-        
+
         $app->redirect('/gerer-echanges');
     });
 
@@ -591,14 +621,14 @@ $router->group('', function (Router $router) use ($app) {
         if (!isset($_SESSION['id_user'])) {
             $app->redirect('/login');
         }
-        
+
         $id_echange = $_GET['id'] ?? null;
         error_log('[DEBUG] /annuler-echange called with id: ' . $id_echange);
         if ($id_echange) {
             $result = ExchangeController::cancel_exchange($id_echange);
             error_log('[DEBUG] cancel_exchange returned: ' . ($result ? 'true' : 'false'));
         }
-        
+
         $app->redirect('/gerer-echanges');
     });
 }, [SecurityHeadersMiddleware::class]);
