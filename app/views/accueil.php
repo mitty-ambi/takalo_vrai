@@ -35,9 +35,21 @@
         <div
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <h2 class="section-title" style="margin-bottom: 0; flex: 1; min-width: 200px;">Mes Objets en Échange</h2>
-            <div style="display: flex; gap: 1rem;">
+            <div style="display: flex; gap: 1rem; align-items:center;">
+
+                <!-- Boutons existants -->
                 <a href="/add-object" class="btn btn-primary">➕ Ajouter un objet</a>
-                <a href="/browse" class="btn btn-primary">🔍 Voir les objets des autres</a>
+
+                <!-- Lien vers la recherche / parcourir -->
+                <a href="/search" class="btn btn-outline-primary">🔎 Parcourir</a>
+
+                <!-- Petit formulaire pour accéder directement à l'historique d'un objet par ID -->
+                <form class="d-flex align-items-center" style="gap:0.5rem;" onsubmit="event.preventDefault(); const id=this.elements['id_objet'].value; if(id) location.href='/objet/'+encodeURIComponent(id)+'/history';">
+                    <input name="id_objet" type="number" min="1" placeholder="ID objet" class="form-control form-control-sm"
+                        style="width:110px;">
+                    <button type="submit" class="btn btn-sm btn-outline-info">📜 Historique</button>
+                </form>
+
             </div>
         </div>
 
@@ -82,6 +94,8 @@
                                 <a href="/delete-object/<?= $objet['id_objet']; ?>" class="btn btn-secondary"
                                     onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objet ?');">🗑️
                                     Supprimer</a>
+                                <a href="/objet/<?= $objet['id_objet'] ?>/history" class="btn btn-sm btn-outline-info">📜
+                                    Historique</a>
                             </div>
                         </div>
                     </div>

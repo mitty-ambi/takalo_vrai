@@ -97,17 +97,17 @@ INSERT INTO Objet (nom_objet, id_categorie, id_user, date_acquisition, prix_esti
 
 -- Insérer des images pour les objets
 INSERT INTO Image_objet (id_objet, url_image) VALUES
-(1, 'https://example.com/phone1.jpg'),
-(1, 'https://example.com/phone2.jpg'),
-(2, 'https://example.com/php_book.jpg'),
-(3, 'https://example.com/chair1.jpg'),
-(4, 'https://example.com/football.jpg'),
-(5, 'https://example.com/pan1.jpg'),
-(6, 'https://example.com/necklace1.jpg'),
-(7, 'https://example.com/tshirt1.jpg'),
-(8, 'https://example.com/lego1.jpg'),
-(9, 'https://example.com/headphones1.jpg'),
-(10, 'https://example.com/table1.jpg');
+(11, 'https://example.com/phone1.jpg'),
+(12, 'https://example.com/phone2.jpg'),
+(13, 'https://example.com/php_book.jpg'),
+(14, 'https://example.com/chair1.jpg'),
+(15, 'https://example.com/football.jpg'),
+(16, 'https://example.com/pan1.jpg'),
+(17, 'https://example.com/necklace1.jpg'),
+(18, 'https://example.com/tshirt1.jpg'),
+(19, 'https://example.com/lego1.jpg'),
+(20, 'https://example.com/headphones1.jpg'),
+(21, 'https://example.com/table1.jpg');
 
 -- Insérer des échanges (date_demande a DEFAULT (CURRENT_DATE) donc pas besoin de NOW())
 INSERT INTO Echange (id_user_1, id_user_2, date_finalisation, statut) VALUES
@@ -138,3 +138,12 @@ INSERT INTO Echange_fille (id_echange_mere, id_objet, quantite, id_proprietaire)
 (7, 4, 1, 4),
 (8, 5, 1, 5),
 (8, 7, 1, 2);
+
+-- Utilisateurs exemples (mdp_hash simple pour dev — remplacer par des hash sécurisés en production)
+INSERT INTO Utilisateur (nom, prenom, email, mdp_hash, type_user, date_creation) VALUES
+('Andriamihaja', 'Rajaonarison', 'rajaonarison@example.com', MD5('secret1'), 'normal', NOW()),
+('Rakoto', 'Miarimanana', 'miarimanana@example.com', MD5('secret2'), 'normal', NOW()),
+('Rasoa', 'Fenosoa', 'fenosoa@example.com', MD5('secret3'), 'normal', NOW()),
+('Rabe', 'Thierry', 'thierry@example.com', MD5('secret4'), 'normal', NOW()),
+('Randriamampionona', 'Aina', 'aina@example.com', MD5('secret5'), 'admin', NOW()),
+('Rasolonjatovo', 'Lalao', 'lalao@example.com', MD5('secret6'), 'normal', NOW());
