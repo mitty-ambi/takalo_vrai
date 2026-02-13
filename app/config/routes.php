@@ -40,8 +40,8 @@ $router->group('', function (Router $router) use ($app) {
 
         $borne1 = $prix - $prix * ($plusOuMoin / 100);
         $borne2 = $prix + $prix * ($plusOuMoin / 100);
-        $ObjetPLusMoins = Objet::OBjetReduction($borne1, $borne2);
-        $app->render('PLusOuMoins', ['ObjetPLusMoins' => $ObjetPLusMoins]);
+        $ObjetPLusMoins = Objet::OBjetReduction($borne1, $borne2, $id_objet);
+        $app->render('PLusOuMoins', ['ObjetPLusMoins' => $ObjetPLusMoins, 'id_objet' => $id_objet, 'prixDeMonObjet' => $prix]);
     });
     $router->get('/search', function () use ($app) {
         $listeCat = CategorieController::getAll();

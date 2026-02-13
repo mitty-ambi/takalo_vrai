@@ -1,3 +1,8 @@
+<?php
+use app\models\Objet;
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,7 +35,17 @@
                             <?= htmlspecialchars($objet['description'] ?? ''); ?>
                         </div>
                         <div class="objet-price">
-                            <?= htmlspecialchars(string: $objet['prix_estime']); ?> Ar
+                            <?php if ($objet['prix_estime'] < $prixDeMonObjet) { ?>
+                                <?= htmlspecialchars(string: $objet['prix_estime']); ?> Ar
+                                <p> (-
+                                    <?= 100 - (($objet['prix_estime'] * 100) / $prixDeMonObjet) ?>%)
+                                </p>
+                            <?php } else { ?>
+                                <?= htmlspecialchars(string: $objet['prix_estime']); ?> Ar
+                                <p> (+
+                                    <?= (($objet['prix_estime'] * 100) / $prixDeMonObjet) - 100 ?>%)
+                                </p>
+                            <?php } ?>
                         </div>
 
                         <div class="objet-actions">
