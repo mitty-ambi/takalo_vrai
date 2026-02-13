@@ -235,15 +235,16 @@ class Objet
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-    public static function OBjetReduction($borne1, $borne2)
+    public static function OBjetReduction($borne1, $borne2, $id_objet)
     {
         $DBH = \Flight::db();
-        $sql = $DBH->prepare("SELECT * FROM Objet WHERE prix_estime >= ? AND prix_estime <= ?");
-        $sql->bindValue(1, $borne1, \PDO::PARAM_STR);
-        $sql->bindValue(2, $borne2, \PDO::PARAM_STR);
+        $sql = $DBH->prepare("SELECT * FROM Objet WHERE prix_estime >= ? AND prix_estime <= ? AND id_objet != ?");
+        $sql->bindValue(1, $borne1, PDO::PARAM_STR);
+        $sql->bindValue(2, $borne2, PDO::PARAM_STR);
+        $sql->bindValue(3, $id_objet, PDO::PARAM_INT);
         $sql->execute();
         $data = [];
-        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+        while ($x = $sql->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $x;
         }
         return $data;
