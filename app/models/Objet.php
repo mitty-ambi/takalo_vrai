@@ -201,7 +201,6 @@ class Objet
         if (!empty($conditions)) {
             $where = "WHERE " . implode(" AND ", $conditions);
         }
-        $sql += $where;
         $where = "";
         if (!empty($conditions)) {
             $where = "WHERE " . implode(" AND ", $conditions);
