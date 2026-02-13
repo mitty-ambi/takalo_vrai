@@ -18,7 +18,6 @@ header_remove('Content-Security-Policy');
         <!-- Search Section -->
         <div class="search-section">
             <h2 class="section-title">Rechercher des objets</h2>
-
             <form action="/search/results" method="POST" class="search-form">
                 <div class="search-grid">
                     <!-- Mot clé -->
