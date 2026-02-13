@@ -1,4 +1,6 @@
-<?php header_remove('Content-Security-Policy'); ?>
+<?php header_remove('Content-Security-Policy');
+use app\models\Categorie;
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -54,7 +56,7 @@
                                 <td class="id-cell">#<?= $cat['id_categorie'] ?></td>
                                 <td class="category-cell"><?= htmlspecialchars($cat['nom_categorie']) ?></td>
                                 <td><?= $cat['date_creation'] ?></td>
-                                <td><strong>42</strong> objets</td>
+                                <td><strong><?= Categorie::getObjetAssocies($cat['id_categorie']) ?></strong> objets</td>
                                 <td><span class="badge badge-success">Active</span></td>
                                 <td class="actions-cell">
                                     <a class="btn-action btn-edit"
