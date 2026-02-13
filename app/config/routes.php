@@ -26,6 +26,22 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
     });
+    $router->get('/reduction', function () use ($app) {
+        $plusOuMoin = isset($_GET['valeur']) ? (float) $_GET['valeur'] : 0.0;
+        $id_objet = $_GET['id'] ?? ($_GET['id_objet'] ?? null);
+        $id_objet = $id_objet !== null ? (int) $id_objet : 0;
+
+        $prix = Objet::getPrixObjet($id_objet);
+        if (!$prix || $plusOuMoin <= 0) {
+            $app->render('PLusOuMoins', ['ObjetPLusMoins' => []]);
+            return;
+        }
+
+        $borne1 = $prix - $prix * ($plusOuMoin / 100);
+        $borne2 = $prix + $prix * ($plusOuMoin / 100);
+        $ObjetPLusMoins = Objet::OBjetReduction($borne1, $borne2);
+        $app->render('PLusOuMoins', ['ObjetPLusMoins' => $ObjetPLusMoins]);
+    });
     $router->get('/search', function () use ($app) {
         $listeCat = CategorieController::getAll();
         $app->render('Search', ['listeCat' => $listeCat]);

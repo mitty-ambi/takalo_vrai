@@ -235,5 +235,30 @@ class Objet
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    public static function OBjetReduction($borne1, $borne2)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Objet WHERE prix_estime >= ? AND prix_estime <= ?");
+        $sql->bindValue(1, $borne1, \PDO::PARAM_STR);
+        $sql->bindValue(2, $borne2, \PDO::PARAM_STR);
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(\PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
+    public static function getPrixObjet($id_objet)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT prix_estime FROM Objet WHERE id_objet = ?");
+        $sql->bindValue(1, $id_objet, PDO::PARAM_INT);
+        $sql->execute();
+        $type = $sql->fetch(PDO::FETCH_ASSOC);
+        if ($type) {
+            return $type['prix_estime'];
+        }
+        return 0;
+    }
 }
 ?>
