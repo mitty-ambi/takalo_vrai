@@ -82,5 +82,6 @@ class Categorie
         }
         return null;
     }
+
 }
 ?>
