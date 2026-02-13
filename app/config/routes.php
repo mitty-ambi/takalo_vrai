@@ -123,7 +123,6 @@ $router->group('', function (Router $router) use ($app) {
         $app->render('login', ['connected' => '1']);
     });
     $router->get('/AdminCat', function () use ($app) {
-
         $cat = new Categorie(0, null);
         $listeCat = $cat->getAll();
         $app->render('AdminCat', ['listeCat' => $listeCat]);

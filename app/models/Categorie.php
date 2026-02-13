@@ -70,5 +70,17 @@ class Categorie
         $sql->bindValue(2, $this->id_categorie, \PDO::PARAM_INT);
         return $sql->execute();
     }
+    public static function getObjetAssocies($id_categorie)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT COUNT(id_categorie) as objet_associes FROM Objet WHERE id_categorie = ?");
+        $sql->bindValue(1, $id_categorie, \PDO::PARAM_INT);
+        $sql->execute();
+        $count = $sql->fetch(\PDO::FETCH_ASSOC);
+        if ($count) {
+            return $count['objet_associes'];
+        }
+        return null;
+    }
 }
 ?>
