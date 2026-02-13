@@ -10,7 +10,6 @@ use flight\net\Router;
 use app\models\User;
 use app\models\Image_objet;
 use app\models\Categorie;
-use app\models\Echange;
 use app\models\EchangeFille;
 use app\models\EchangeMere;
 use app\models\Objet;
@@ -632,7 +631,7 @@ $router->group('', function (Router $router) use ($app) {
     });
 }, [SecurityHeadersMiddleware::class]);
 
-Flight::route('GET /objet/@id/history', function($id) {
-    $history = \app\models\Objet::history((int)$id);
-    Flight::render('object_history', ['history' => $history, 'id_objet' => (int)$id]);
+Flight::route('GET /objet/@id/history', function ($id) {
+    $history = \app\models\Objet::history((int) $id);
+    Flight::render('object_history', ['history' => $history, 'id_objet' => (int) $id]);
 });
