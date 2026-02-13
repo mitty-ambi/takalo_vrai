@@ -53,13 +53,17 @@
                         <div class="objet-content">
                             <div class="objet-title"><?= htmlspecialchars($objet['nom_objet']); ?></div>
                             <div class="objet-description"><?= htmlspecialchars($objet['description'] ?? ''); ?></div>
-                            <div class="objet-price"><?= htmlspecialchars($objet['prix_estime']); ?> Ar</div>
+                            <div class="objet-price"><?= htmlspecialchars(string: $objet['prix_estime']); ?> Ar</div>
 
                             <div class="objet-actions">
                                 <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-edit">✏️ Éditer</a>
                                 <a href="/supprimer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-delete"
                                     onclick="return confirm('Êtes-vous sûr ?');">🗑️ Supprimer</a>
                                 <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-photo">📷 Photos</a>
+                                <a href="/reduction?id=<?= $objet['id_objet']; ?>&valeur=10" class="btn-small btn-photo">+/-
+                                    10%</a>
+                                <a href="/reduction?id=<?= $objet['id_objet']; ?>&valeur=20" class="btn-small btn-photo">+/-
+                                    20%</a>
                             </div>
                         </div>
                     </div>

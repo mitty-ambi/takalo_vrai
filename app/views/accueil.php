@@ -16,7 +16,8 @@
         <div class="header-content">
             <div>
                 <h1 class="header-title">Takalo Vrai</h1>
-                <p class="header-subtitle">Bienvenue, <?= htmlspecialchars($donnees_utilisateur['prenom'] ?? 'Utilisateur'); ?> 👋
+                <p class="header-subtitle">Bienvenue,
+                    <?= htmlspecialchars($donnees_utilisateur['prenom'] ?? 'Utilisateur'); ?> 👋
                 </p>
             </div>
             <div class="user-info">
@@ -44,9 +45,10 @@
                 <a href="/search" class="btn btn-outline-primary">🔎 Parcourir</a>
 
                 <!-- Petit formulaire pour accéder directement à l'historique d'un objet par ID -->
-                <form class="d-flex align-items-center" style="gap:0.5rem;" onsubmit="event.preventDefault(); const id=this.elements['id_objet'].value; if(id) location.href='/objet/'+encodeURIComponent(id)+'/history';">
-                    <input name="id_objet" type="number" min="1" placeholder="ID objet" class="form-control form-control-sm"
-                        style="width:110px;">
+                <form class="d-flex align-items-center" style="gap:0.5rem;"
+                    onsubmit="event.preventDefault(); const id=this.elements['id_objet'].value; if(id) location.href='/objet/'+encodeURIComponent(id)+'/history';">
+                    <input name="id_objet" type="number" min="1" placeholder="ID objet"
+                        class="form-control form-control-sm" style="width:110px;">
                     <button type="submit" class="btn btn-sm btn-outline-info">📜 Historique</button>
                 </form>
 
