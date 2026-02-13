@@ -65,6 +65,10 @@
                                 <a href="/reduction?id=<?= $objet['id_objet']; ?>&valeur=20" class="btn-small btn-photo">+/-
                                     20%</a>
                             </div>
+                            <div class="btn-group">
+                                <a href="/objet/<?= $objet['id_objet']; ?>" class="btn btn-sm btn-outline-primary">Détails</a>
+                                <a href="/objet/<?= $objet['id_objet']; ?>/history" class="btn btn-sm btn-outline-info">📜 Historique</a>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
