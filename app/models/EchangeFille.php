@@ -56,6 +56,7 @@ class EchangeFille
         } catch (\Exception $e) {
             error_log('[ERROR] get_by_echange: ' . $e->getMessage());
             return false;
+            $a = 0;
         }
     }
 

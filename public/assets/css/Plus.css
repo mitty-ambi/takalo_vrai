@@ -194,6 +194,23 @@ body {
     border-color: var(--primary-light);
 }
 
+/* Make cards equal-height columns and push actions to bottom */
+.objet-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.objet-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.objet-actions {
+    /* ensure action buttons stay together at bottom */
+    margin-top: auto;
+}
+
 /* ===== REDUCTION TAG ===== */
 .reduction-tag {
     position: absolute;
