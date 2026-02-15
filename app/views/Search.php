@@ -39,7 +39,9 @@ header_remove('Content-Security-Policy');
                         </label>
                         <select name="categorie" id="categorie" class="search-select">
                             <option value="">Toutes les catégories</option>
-                            <?php foreach ($listeCat as $cat): ?>
+                            <?php foreach ($listeCat as $cat): 
+                                $a = 0;
+                                ?>
                                 <option value="<?= $cat['id_categorie'] ?>" <?= (isset($_POST['categorie']) && $_POST['categorie'] == $cat['id_categorie']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cat['nom_categorie']) ?>
                                 </option>
