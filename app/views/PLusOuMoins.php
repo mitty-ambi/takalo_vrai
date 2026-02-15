@@ -98,6 +98,20 @@ use app\models\Objet;
                                         Photos</a>
                                 </div>
                             </div>
+                        <div class="objet-actions">
+                            <form action="/proposer-echange" method="post">
+                                <input type="hidden" name="id_objet_receiver" value="<?= $objet['id_objet']; ?>">
+                                <input type="hidden" name="id_objet_sender" value="<?= $_GET['id']; ?>">
+                                <button type="submit" class="btn-small btn-propose">Proposer un échange</button>
+                            </form>
+                            <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-edit">✏️ Éditer</a>
+                            <a href="/supprimer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-delete"
+                                onclick="return confirm('Êtes-vous sûr ?');">🗑️ Supprimer</a>
+                            <a href="/editer-objet?id=<?= $objet['id_objet']; ?>" class="btn-small btn-photo">📷 Photos</a>
+                            <a href="/reduction?id=<?= $objet['id_objet']; ?>&valeur=10" class="btn-small btn-photo">+/-
+                                10%</a>
+                            <a href="/reduction?id=<?= $objet['id_objet']; ?>&valeur=20" class="btn-small btn-photo">+/-
+                                20%</a>
                         </div>
                     <?php endforeach; ?>
                 </div>

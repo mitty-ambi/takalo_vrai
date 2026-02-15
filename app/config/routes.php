@@ -10,7 +10,6 @@ use flight\net\Router;
 use app\models\User;
 use app\models\Image_objet;
 use app\models\Categorie;
-use app\models\Echange;
 use app\models\EchangeFille;
 use app\models\EchangeMere;
 use app\models\Objet;
