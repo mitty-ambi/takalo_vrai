@@ -1,12 +1,16 @@
 <?php
 use app\controllers\BesoinController;
 use app\controllers\DonsController;
+use app\controllers\DashboardController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
 use app\models\Matiere;
 use app\models\Dons;
 use app\models\Ville;
+use app\models\Besoin;
+use app\models\Categorie;
+use Flight;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -38,22 +42,28 @@ $router->group('', function (Router $router) use ($app) {
     });
     $router->get('/gerer_besoins', function () use ($app) {
         $villes = \app\models\Ville::getAll();
+        $categories = \app\models\Categorie::getAll();
         $matieres = \app\models\Matiere::getAll();
         $app->render('gerer_besoins', [
             'villes' => $villes,
+            'categories' => $categories,
             'matieres' => $matieres
         ]);
     });
     $router->get('/gerer_dons', function () use ($app) {
         $matieres = \app\models\Matiere::getAll();
+        $categories = \app\models\Categorie::getAll();
         $app->render('gerer_dons', [
-            'matieres' => $matieres
+            'matieres' => $matieres,
+            'categories' => $categories
         ]);
     });
     $router->get('/valider_dons', function () use ($app) {
         $matieres = \app\models\Matiere::getAll();
+        $categories = \app\models\Categorie::getAll();
         $app->render('gerer_dons', [
-            'matieres' => $matieres
+            'matieres' => $matieres,
+            'categories' => $categories
         ]);
     });
     $router->get('/dispatch', function () use ($app) {
@@ -65,7 +75,7 @@ $router->group('', function (Router $router) use ($app) {
         ]);
     });
     $router->post('/valider_dons', function () use ($app) {
-        $id_matiere = $_POST['matiere'] ?? null;
+        $id_matiere = $_POST['id_matiere'] ?? null;
         $quantite = $_POST['quantite'] ?? null;
         $date_don = $_POST['date_don'] ?? null;
 
@@ -124,11 +134,13 @@ $router->group('', function (Router $router) use ($app) {
 
         $matieres = \app\models\Matiere::getAll();
         $villes = \app\models\Ville::getAll();
+        $categories = \app\models\Categorie::getAll();
 
         $app->render('edit_don', [
             'don' => $don,
             'matieres' => $matieres,
-            'villes' => $villes
+            'villes' => $villes,
+            'categories' => $categories
         ]);
     });
 

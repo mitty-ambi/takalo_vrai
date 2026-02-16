@@ -19,7 +19,7 @@
         </tr>
         <?php foreach ($listeBesoin as $besoin) { ?>
             <tr>
-                <td><?= $besoin['nom_matiere'] ?></td>
+                <td><?= htmlspecialchars($besoin['nom_categorie'] ?? 'N/A') ?> (<?= htmlspecialchars($besoin['nom_matiere']) ?>)</td>
                 <td><?=  $besoin['quantite'] ?></td>
             </tr>
         <?php } ?>
@@ -33,7 +33,7 @@
         </tr>
         <?php foreach ($listeDons as $dons) { ?>
             <tr>
-                <td><?=  $dons['nom_matiere'] ?></td>
+                <td><?= htmlspecialchars($dons['nom_categorie'] ?? 'N/A') ?> (<?= htmlspecialchars($dons['nom_matiere']) ?>)</td>
                 <td><?=  $dons['quantite'] ?></td>
                 <td><?=  $dons['date_don']  ?></td>
             </tr>
