@@ -22,7 +22,7 @@ use app\models\Ville;
         </tr>
         <?php foreach ($listeBesoin as $besoin) { ?>
             <tr>
-                <td><?=  $besoin['nom_matiere'] ?></td>
+                <td><?= $besoin['nom_matiere'] ?></td>
                 <td><?=  $besoin['quantite'] ?></td>
             </tr>
         <?php } ?>
