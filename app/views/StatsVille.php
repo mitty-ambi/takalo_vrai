@@ -201,7 +201,7 @@
                                     <td>
                                         <button class="btn-acheter"
                                             data-matiere="<?= htmlspecialchars($reste['nom_matiere']) ?>"
-                                            data-id-matiere="<?= $reste['id_matiere'] ?>" 
+                                            data-id-matiere="<?= $reste['id_matiere'] ?>"
                                             data-quantite-restante="<?= $reste['reste'] ?>"
                                             data-prix="<?= $reste['prix_unitaire'] ?>">
                                             🛒 Acheter
@@ -329,7 +329,7 @@
             var idMatiere = btn.getAttribute('data-id-matiere');
             var quantiteRestante = parseInt(btn.getAttribute('data-quantite-restante'));
             var prixUnitaire = parseInt(btn.getAttribute('data-prix'));
-            
+
             var valeurRestante = quantiteRestante * prixUnitaire;
 
             document.getElementById('modalMatiere').textContent = matiere;
@@ -337,7 +337,7 @@
             document.getElementById('id_matiere').value = idMatiere;
             document.getElementById('fraisAchat').textContent = fraisConfigu;
             document.getElementById('pourcentage').value = 50;
-            
+
             // Stocker les valeurs pour le calcul
             window.currentPrix = prixUnitaire;
             window.currentValeurRestante = valeurRestante;
