@@ -29,7 +29,6 @@
 </style>
 
 <script>
-    // Script pour le menu mobile
     document.addEventListener('DOMContentLoaded', function () {
         const mobileBtn = document.getElementById('mobileBtn');
         const navMenu = document.getElementById('navMenu');
@@ -41,7 +40,6 @@
             });
         }
 
-        // Fermer le menu quand on clique sur un lien
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
             link.addEventListener('click', function () {

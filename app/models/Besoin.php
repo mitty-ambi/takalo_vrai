@@ -26,7 +26,7 @@ class Besoin
         $stmt->bindValue(':id_matiere', (int) $this->id_matiere, PDO::PARAM_INT);
         $stmt->bindValue(':id_ville', (int) $this->id_ville, PDO::PARAM_INT);
         $stmt->bindValue(':quantite', $this->quantite);
-        
+
         if ($stmt->execute()) {
             return true;
         } else {
