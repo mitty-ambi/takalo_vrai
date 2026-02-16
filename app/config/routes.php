@@ -25,13 +25,11 @@ $router->group('', function (Router $router) use ($app) {
         // optional search filter by city name
         $search = trim($_GET['nom_ville'] ?? '');
         $listeVille = Ville::getAll();
-
         if ($search !== '') {
             $listeVille = array_values(array_filter($listeVille, function ($v) use ($search) {
                 return isset($v['nom_ville']) && stripos($v['nom_ville'], $search) !== false;
             }));
         }
-
         $app->render('index', ['listeVille' => $listeVille, 'nom_ville' => $search]);
     });
     $router->get('/StatsVille', function () use ($app) {
@@ -191,3 +189,5 @@ $router->group('', function (Router $router) use ($app) {
     });
 }, [SecurityHeadersMiddleware::class]);
 
+
+// ZXFQM6vH
