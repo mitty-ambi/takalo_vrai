@@ -1,12 +1,15 @@
 <?php
 use app\controllers\BesoinController;
 use app\controllers\DonsController;
+use app\controllers\DashboardController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
 use app\models\Matiere;
 use app\models\Dons;
 use app\models\Ville;
+use app\models\Besoin;
+use Flight;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -30,6 +33,12 @@ $router->group('', function (Router $router) use ($app) {
 
         $app->render('index', ['listeVille' => $listeVille, 'nom_ville' => $search]);
     });
+
+    $router->get('/dashboard', function () use ($app) {
+        $data = \app\controllers\DashboardController::getDashboardData();
+        $app->render('dashboard', $data);
+    });
+
     $router->get('/StatsVille', function () use ($app) {
         $id_ville = $_GET['id_ville'];
         $listeBesoin = BesoinController::getBesoinVIlle($id_ville);
