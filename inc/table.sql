@@ -28,4 +28,3 @@ create table Besoin(
     quantite int,
     id_ville int
 );
-blabla;
