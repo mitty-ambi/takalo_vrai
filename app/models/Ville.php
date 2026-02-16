@@ -1,10 +1,12 @@
 <?php
+
 namespace app\models;
 
 use PDO;
 
 class Ville
 {
+class Ville{
     public $id_ville;
     public $nom_ville;
     public $id_region;
@@ -49,3 +51,4 @@ class Ville
 }
 
 ?>
+}
