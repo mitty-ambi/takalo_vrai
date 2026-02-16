@@ -6,7 +6,6 @@ use PDO;
 
 class Ville
 {
-class Ville{
     public $id_ville;
     public $nom_ville;
     public $id_region;
@@ -36,6 +35,7 @@ class Ville{
         $stmt = $DBH->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
     public static function getNomVIlle($id_ville)
     {
         $DBH = \Flight::db();
@@ -49,6 +49,4 @@ class Ville{
         return null;
     }
 }
-}
-?>
 

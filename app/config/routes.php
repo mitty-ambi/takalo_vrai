@@ -1,7 +1,6 @@
 <?php
 use app\controllers\BesoinController;
 use app\controllers\DonsController;
-use app\models\Ville;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;

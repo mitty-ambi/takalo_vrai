@@ -32,6 +32,8 @@ class Dons
             $data[] = $x;
         }
         return $data;
+    }
+
     public function insert_base()
     {
         $DBH = \Flight::db();
