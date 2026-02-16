@@ -187,6 +187,9 @@ $router->group('', function (Router $router) use ($app) {
 
         \Flight::json($result);
     });
+    $router->get('/simulation', function () use ($app) {
+    $app->render('simulation'); // affichera app/views/simulation.php
+});
 }, [SecurityHeadersMiddleware::class]);
 
 
