@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/navbar.css">
+    <link rel="stylesheet" href="/assets/css/crud_dons_page.css">
     <title>Gérer les Dons - BNGRC</title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/css/crud_dons.css">
 </head>
 <body>
+    <?php include("navbar.php"); ?>
+    
     <div class="container">
-        <div class="header">
+        <div class="page-header">
             <h1>📋 Gestion des Dons</h1>
             <p>Modifier ou supprimer des dons</p>
         </div>

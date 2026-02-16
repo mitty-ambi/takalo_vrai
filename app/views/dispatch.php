@@ -4,50 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNGRC - Dispatch</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/assets/css/navbar.css">
+    <link rel="stylesheet" href="/assets/css/dispatch_page.css">
+    <title>Dispatch des Dons - BNGRC</title>
 </head>
 
 <body>
-    <?php include __DIR__ . '/navbar.php'; ?>
-
-    <div class="container my-4">
-        <h1 class="page-title">Dispatch des dons</h1>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-warning">
-                        <h5>En attente de dispatch</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="dispatch-item">
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Riz</strong> - 500 kg</span>
-                                <span class="badge bg-info">Croix Rouge</span>
-                            </div>
-                            <p class="text-muted">Date: 15/01/2024</p>
-                            <button class="btn btn-sm btn-primary">Dispatcher</button>
-                        </div>
-                        <hr>
-                        <div class="dispatch-item">
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Tôles</strong> - 200 pièces</span>
-                                <span class="badge bg-info">UNICEF</span>
-                            </div>
-                            <p class="text-muted">Date: 14/01/2024</p>
-                            <button class="btn btn-sm btn-primary">Dispatcher</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5>Derniers dispatches</h5>
+    <?php include("navbar.php"); ?>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📦 Dispatch des Dons</h1>
+            <p>Assignez les dons non distribués à des villes</p>
+        </div>
                     </div>
                     <div class="card-body">
                         <div class="dispatch-item">
@@ -58,41 +27,8 @@
                             <p class="text-muted">15/01/2024 - 400 kg</p>
                         </div>
                         <hr>
-                        <div class="dispatch-item">
-                            <div class="d-flex justify-content-between">
-                                <span><strong>Huile</strong> → Toamasina</span>
-                                <span class="badge bg-success">Livré</span>
-                            </div>
-                            <p class="text-muted">14/01/2024 - 300 L</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bngrc-footer">
-        <!-- ... footer content ... -->
-    </footer>
-</body>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dispatch des Dons - BNGRC</title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/css/dispatch.css">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📦 Dispatch des Dons</h1>
-            <p>Gestion et distribution des dons reçus</p>
-        </div>
-
         <?php if (!empty($dons_non_distribuees)): ?>
-            <div class="stats">
+            <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-number"><?= count($dons_non_distribuees) ?></div>
                     <div class="stat-label">Dons en attente</div>
@@ -104,71 +40,71 @@
             </div>
         <?php endif; ?>
 
-        <h2>Dons à Distribuer</h2>
-        
-        <?php if (empty($dons_non_distribuees)): ?>
-            <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <h3>Aucun don en attente</h3>
-                <p>Tous les dons ont déjà été distribués!</p>
-            </div>
-        <?php else: ?>
-            <?php foreach ($dons_non_distribuees as $don): ?>
-                <div class="don-card">
-                    <div class="don-header">
-                        <div class="don-titre">
-                            📦 <?= htmlspecialchars($don['nom_matiere']) ?>
-                        </div>
-                        <div class="don-date">
-                            📅 <?= htmlspecialchars($don['date_don']) ?>
-                        </div>
-                    </div>
-
-                    <div class="don-details">
-                        <div class="detail-item">
-                            <div class="detail-label">QUANTITÉ</div>
-                            <div class="detail-value"><?= htmlspecialchars($don['quantite']) ?> unités</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">PRIX UNITAIRE</div>
-                            <div class="detail-value"><?= number_format((float)$don['prix_unitaire'], 2, ',', ' ') ?> Ar</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">VALEUR TOTALE</div>
-                            <div class="detail-value"><?= number_format((float)$don['prix_unitaire'] * $don['quantite'], 2, ',', ' ') ?> Ar</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">STATUT</div>
-                            <div class="detail-value">
-                                <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;">
-                                    ⏳ En attente
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Formulaire inline pour assigner la ville -->
-                    <form method="POST" action="/update-dons" class="don-form">
-                        <input type="hidden" name="id_don" value="<?= htmlspecialchars($don['id_don']) ?>">
-                        
-                        <div class="don-form-group">
-                            <label for="ville_<?= $don['id_don'] ?>">Assigner à une ville:</label>
-                            <div class="don-form-row">
-                                <select name="id_ville" id="ville_<?= $don['id_don'] ?>" required class="don-select">
-                                    <option value="">-- Choisir une ville --</option>
-                                    <?php foreach ($villes as $ville): ?>
-                                        <option value="<?= htmlspecialchars($ville['id_ville']) ?>">
-                                            <?= htmlspecialchars($ville['nom_ville']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="submit" class="btn btn-success btn-small">✓ Assigner</button>
-                            </div>
-                        </div>
-                    </form>
+        <div class="dons-container">
+            <h2>📋 Dons à Distribuer</h2>
+            
+            <?php if (empty($dons_non_distribuees)): ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h3>Aucun don en attente</h3>
+                    <p>Tous les dons ont déjà été distribués!</p>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+            <?php else: ?>
+                <?php foreach ($dons_non_distribuees as $don): ?>
+                    <div class="don-card">
+                        <div class="don-card-header">
+                            <div class="don-titre">
+                                📦 <?= htmlspecialchars($don['nom_matiere']) ?>
+                            </div>
+                            <div class="don-date">
+                                📅 <?= htmlspecialchars($don['date_don']) ?>
+                            </div>
+                        </div>
+
+                        <div class="don-details">
+                            <div class="detail-item">
+                                <div class="detail-label">QUANTITÉ</div>
+                                <div class="detail-value"><?= htmlspecialchars($don['quantite']) ?> unités</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">PRIX UNITAIRE</div>
+                                <div class="detail-value"><?= number_format((float)$don['prix_unitaire'], 2, ',', ' ') ?> Ar</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">VALEUR TOTALE</div>
+                                <div class="detail-value"><?= number_format((float)$don['prix_unitaire'] * $don['quantite'], 2, ',', ' ') ?> Ar</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">STATUT</div>
+                                <div class="detail-value">
+                                    <span class="badge-pending">⏳ En attente</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulaire inline pour assigner la ville -->
+                        <form method="POST" action="/update-dons" class="don-form">
+                            <input type="hidden" name="id_don" value="<?= htmlspecialchars($don['id_don']) ?>">
+                            
+                            <div class="don-form-group">
+                                <label for="ville_<?= $don['id_don'] ?>">Assigner à une ville:</label>
+                                <div class="don-form-row">
+                                    <select name="id_ville" id="ville_<?= $don['id_don'] ?>" required class="don-select">
+                                        <option value="">-- Choisir une ville --</option>
+                                        <?php foreach ($villes as $ville): ?>
+                                            <option value="<?= htmlspecialchars($ville['id_ville']) ?>">
+                                                <?= htmlspecialchars($ville['nom_ville']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="submit" class="btn btn-success btn-small">✓ Assigner</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
     </div>
 </body>
 </html>
