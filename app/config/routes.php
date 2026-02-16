@@ -18,8 +18,17 @@ ini_set('display_startup_errors', 1);
 
 $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
+        // optional search filter by city name
+        $search = trim($_GET['nom_ville'] ?? '');
         $listeVille = Ville::getAll();
-        $app->render('index', ['listeVille' => $listeVille]);
+
+        if ($search !== '') {
+            $listeVille = array_values(array_filter($listeVille, function ($v) use ($search) {
+                return isset($v['nom_ville']) && stripos($v['nom_ville'], $search) !== false;
+            }));
+        }
+
+        $app->render('index', ['listeVille' => $listeVille, 'nom_ville' => $search]);
     });
     $router->get('/StatsVille', function () use ($app) {
         $id_ville = $_GET['id_ville'];
@@ -67,7 +76,7 @@ $router->group('', function (Router $router) use ($app) {
         }
 
         $don = new \app\models\Dons(null, $id_matiere, $quantite, $date_don, 0);
-        
+
         if ($don->insert_base()) {
             error_log('[SUCCESS] Don créé avec succès');
             $app->redirect('/gerer_dons');
@@ -104,7 +113,7 @@ $router->group('', function (Router $router) use ($app) {
 
     $router->get('/crud_dons/edit/@id_don', function ($id_don) use ($app) {
         $don = \app\models\Dons::getByIdWithMatiere($id_don);
-        
+
         if (!$don) {
             $app->render('crud_dons', [
                 'dons' => \app\models\Dons::getAllWithMatiere(),
@@ -165,7 +174,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/registre', function () use ($app) {
 
         $result = \app\controllers\BesoinController::create();
-        
+
         \Flight::json($result);
     });
 }, [SecurityHeadersMiddleware::class]);
