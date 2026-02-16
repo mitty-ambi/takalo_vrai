@@ -46,7 +46,19 @@ if (empty($app) === true) {
 $app->path(__DIR__ . $ds . '..' . $ds . '..');
 
 // Core config variables
-$app->set('flight.base_url', '/', );           // Base URL for your app. Change if app is in a subdirectory (e.g., '/myapp/')
+// Auto-detect base_url : fonctionne en local ET sur le serveur de l'école
+// Sur le serveur : http://172.16.7.131/ETU003943/takalo/ → base = /ETU003943/takalo
+// En local :      http://localhost:8000/                  → base = (vide)
+$script_name = $_SERVER['SCRIPT_NAME'] ?? '';
+$base_url_auto = rtrim(str_replace('\\', '/', dirname($script_name)), '/');
+// Si on est dans public/, on remonte d'un niveau pour avoir la bonne base
+if (basename($base_url_auto) === 'public') {
+	$base_url_auto = rtrim(dirname($base_url_auto), '/');
+}
+if ($base_url_auto === '' || $base_url_auto === '.' || $base_url_auto === '/') {
+	$base_url_auto = '';
+}
+$app->set('flight.base_url', $base_url_auto);
 $app->set('flight.case_sensitive', false);    // Set true for case sensitive routes. Default: false
 $app->set('flight.log_errors', true);         // Log errors to file. Recommended: true in production
 $app->set('flight.handle_errors', false);     // Let Tracy handle errors if false. Set true to use Flight's error handler

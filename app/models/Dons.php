@@ -24,11 +24,7 @@ class Dons
     public static function getDonsVille($id_ville)
     {
         $DBH = \Flight::db();
-        $sql = $DBH->prepare("SELECT d.*, m.nom_matiere, m.id_categorie, c.nom_categorie 
-                              FROM Dons d 
-                              JOIN Matiere m ON d.id_matiere = m.id_matiere 
-                              LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie 
-                              WHERE d.id_ville = ?");
+        $sql = $DBH->prepare("SELECT * FROM Dons JOIN Matiere ON Dons.id_matiere = Matiere.id_matiere WHERE id_ville = ?");
         $sql->bindValue(1, $id_ville, PDO::PARAM_INT);
         $sql->execute();
         $data = [];
@@ -43,10 +39,10 @@ class Dons
         $DBH = \Flight::db();
         $query = "INSERT INTO Dons (id_matiere, quantite, date_don, id_ville) VALUES (:id_matiere, :quantite, :date_don, :id_ville)";
         $stmt = $DBH->prepare($query);
-        $stmt->bindValue(':id_matiere', (int)$this->id_matiere, PDO::PARAM_INT);
+        $stmt->bindValue(':id_matiere', (int) $this->id_matiere, PDO::PARAM_INT);
         $stmt->bindValue(':quantite', $this->quantite);
         $stmt->bindValue(':date_don', $this->date_don);
-        $stmt->bindValue(':id_ville', (int)($this->id_ville ?? 0), PDO::PARAM_INT);
+        $stmt->bindValue(':id_ville', (int) ($this->id_ville ?? 0), PDO::PARAM_INT);
 
         if ($stmt->execute()) {
             return true;

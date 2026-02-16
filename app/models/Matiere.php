@@ -22,12 +22,11 @@ class Matiere
     public function insert_base()
     {
         $DBH = \Flight::db();
-        $query = "INSERT INTO Matiere (nom_matiere, prix_unitaire, id_categorie) VALUES (:nom_matiere, :prix_unitaire, :id_categorie)";
+        $query = "INSERT INTO Matiere (nom_matiere, prix_unitaire) VALUES (:nom_matiere, :prix_unitaire)";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':nom_matiere', $this->nom_matiere);
         $stmt->bindValue(':prix_unitaire', (float) $this->prix_unitaire, PDO::PARAM_STR);
-        $stmt->bindValue(':id_categorie', (int) $this->id_categorie, PDO::PARAM_INT);
-        
+
         if ($stmt->execute()) {
             return true;
         } else {
@@ -36,7 +35,7 @@ class Matiere
     }
 
     /**
-     * Get all materials
+     * Récupérer toutes les matières
      */
     public static function getAll()
     {
@@ -47,20 +46,7 @@ class Matiere
     }
 
     /**
-     * Get materials by category
-     */
-    public static function getByCategorie($id_categorie)
-    {
-        $DBH = \Flight::db();
-        $query = "SELECT * FROM Matiere WHERE id_categorie = :id_categorie ORDER BY nom_matiere ASC";
-        $stmt = $DBH->prepare($query);
-        $stmt->bindValue(':id_categorie', (int) $id_categorie, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Get material by ID
+     * Récupérer une matière par ID
      */
     public static function getById($id_matiere)
     {
@@ -73,33 +59,21 @@ class Matiere
     }
 
     /**
-     * Get all materials with category info
+     * Mettre à jour une matière
      */
-    public static function getAllWithCategorie()
+    public static function update($id_matiere, $nom_matiere, $prix_unitaire)
     {
         $DBH = \Flight::db();
-        $query = "SELECT m.*, c.nom_categorie FROM Matiere m LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie ORDER BY c.nom_categorie, m.nom_matiere ASC";
-        $stmt = $DBH->query($query);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Update a material
-     */
-    public static function update($id_matiere, $nom_matiere, $prix_unitaire, $id_categorie = null)
-    {
-        $DBH = \Flight::db();
-        $query = "UPDATE Matiere SET nom_matiere = :nom_matiere, prix_unitaire = :prix_unitaire, id_categorie = :id_categorie WHERE id_matiere = :id_matiere";
+        $query = "UPDATE Matiere SET nom_matiere = :nom_matiere, prix_unitaire = :prix_unitaire WHERE id_matiere = :id_matiere";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':id_matiere', (int) $id_matiere, PDO::PARAM_INT);
         $stmt->bindValue(':nom_matiere', $nom_matiere);
         $stmt->bindValue(':prix_unitaire', (float) $prix_unitaire, PDO::PARAM_STR);
-        $stmt->bindValue(':id_categorie', (int) $id_categorie, PDO::PARAM_INT);
         return $stmt->execute();
     }
 
     /**
-     * Delete a material
+     * Supprimer une matière
      */
     public static function delete($id_matiere)
     {
@@ -109,7 +83,6 @@ class Matiere
         $stmt->bindValue(':id_matiere', (int) $id_matiere, PDO::PARAM_INT);
         return $stmt->execute();
     }
-
     /**
      * Chercher une matière par nom
      */

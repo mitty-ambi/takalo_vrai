@@ -1,0 +1,273 @@
+/* ===== CRUD DONS PAGE STYLES ===== */
+:root {
+    --bngrc-blue: #003366;
+    --bngrc-orange: #FF6600;
+    --bngrc-red: #CC3300;
+    --bngrc-dark: #002244;
+    --bngrc-light: #f8f9fa;
+    --bngrc-gray: #6c757d;
+}
+
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    background: linear-gradient(135deg, #003366 0%, #002244 100%);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-left: 5px solid #FF6600;
+}
+
+.page-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.page-header p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.95;
+}
+
+/* ===== DONS GRID ===== */
+.dons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* ===== DON CARD ===== */
+.don-card-crud {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.don-card-crud:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.don-card-header {
+    background: linear-gradient(135deg, #003366 0%, #002244 100%);
+    color: white;
+    padding: 20px;
+    border-bottom: 3px solid #FF6600;
+}
+
+.don-card-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.don-id {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.don-card-body {
+    padding: 20px;
+    flex: 1;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #003366;
+    font-size: 0.85rem;
+}
+
+.info-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.badge-assigned {
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.don-card-actions {
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.form-delete {
+    flex: 1;
+    margin: 0;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+    flex: 1;
+}
+
+.btn-edit {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #138496;
+    text-decoration: none;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: #CC3300;
+    color: white;
+    width: 100%;
+}
+
+.btn-delete:hover {
+    background: #bb2800;
+    transform: translateY(-2px);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    color: #003366;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #6c757d;
+}
+
+/* ===== ALERT MESSAGES ===== */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: #CC3300;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 30px 20px;
+        margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .dons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .don-card-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .form-delete {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .don-card-header h3 {
+        font-size: 1.1rem;
+    }
+}
