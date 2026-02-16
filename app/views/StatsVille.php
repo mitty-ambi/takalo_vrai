@@ -1,19 +1,16 @@
-<?php 
-use app\models\Ville;
-?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/navbar.css">
-    <link rel="stylesheet" href="assets/css/index.css">
-    <title>Document</title>
+    <link rel="stylesheet" href="/assets/css/navbar.css">
+    <link rel="stylesheet" href="/assets/css/index.css">
+    <title>Statistiques de la Ville - BNGRC</title>
 </head>
 
 <body>
-    <?php include("navbar.php") ?>
+    <?php include("navbar.php"); ?>
     <h1>Liste des besoins de la ville : <?= $nomville  ?></h1>
     <table border="1px">
         <tr>

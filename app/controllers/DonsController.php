@@ -4,14 +4,14 @@ namespace app\controllers;
 
 use app\models\Dons;
 use PDO;
+
 class DonsController
 {
     public static function getDonsVille($id_ville)
     {
         return Dons::getDonsVille($id_ville);
+    }
 
-class DonsController
-{
     public static function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
