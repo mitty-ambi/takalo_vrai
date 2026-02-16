@@ -26,9 +26,9 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
     });
+    $router->get('/gerer_besoins', function () use ($app) {
+        
+        $app->render('gerer_besoins');
+    });
 }, [SecurityHeadersMiddleware::class]);
 
-Flight::route('GET /objet/@id/history', function ($id) {
-    $history = \app\models\Objet::history((int) $id);
-    Flight::render('object_history', ['history' => $history, 'id_objet' => (int) $id]);
-});
