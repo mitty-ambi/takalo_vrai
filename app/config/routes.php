@@ -24,7 +24,7 @@ ini_set('display_startup_errors', 1);
 
 $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
-        $app->render('register', ['ls_donnees_prod' => 'a']);
+        $app->render('index', ['ls_donnees_prod' => 'a']);
     });
     $router->get('/gerer_besoins', function () use ($app) {
         
