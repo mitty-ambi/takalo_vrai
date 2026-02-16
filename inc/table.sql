@@ -27,4 +27,5 @@ create table Besoin(
     id_matiere int,
     quantite int,
     id_ville int
-)
+);
+blabla;
