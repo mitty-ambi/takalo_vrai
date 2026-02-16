@@ -14,7 +14,7 @@
             </button>
 
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.html" class="nav-link active">Accueil</a></li>
+                <li><a href="/" class="nav-link active">Accueil</a></li>
                 <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
                 <li><a href="/gerer_besoins" class="nav-link">Besoins</a></li>
                 <li><a href="/crud_dons" class="nav-link">Dons</a></li>

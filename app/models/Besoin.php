@@ -21,7 +21,7 @@ class Besoin
     public function insert_base()
     {
         $DBH = \Flight::db();
-        $query = "INSERT INTO Besoin (id_matiere, id_ville, quantite, description) VALUES (:id_matiere, :id_ville, :quantite, :description)";
+        $query = "INSERT INTO Besoin (id_matiere, id_ville, quantite) VALUES (:id_matiere, :id_ville, :quantite)";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':id_matiere', (int) $this->id_matiere, PDO::PARAM_INT);
         $stmt->bindValue(':id_ville', (int) $this->id_ville, PDO::PARAM_INT);
