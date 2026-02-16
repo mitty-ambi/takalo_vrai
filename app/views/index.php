@@ -10,6 +10,8 @@
 
 <body>
     <?php include("navbar.php") ?>
+    <h1>Tableau recapitullant la liste des villes avec Besoins</h1>
+    <table></table>
 </body>
 
 </html>
