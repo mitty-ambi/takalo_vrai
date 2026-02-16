@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <title>BNGRC - Accueil</title>
 </head>
 
 <body>
-    <h1>Gestion de sinistrés</h1>
-    kljkhjgv
+    <?php include("navbar.php") ?>
 </body>
 
 </html>

@@ -1,0 +1,186 @@
+    /* Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Navbar principale */
+    .bngrc-navbar {
+        background: linear-gradient(90deg, #003366 0%, #002244 100%);
+        padding: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border-bottom: 3px solid #FF6600;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .nav-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+    }
+
+    /* Logo */
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: white;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .nav-logo i {
+        color: #FF6600;
+        font-size: 2rem;
+        transition: transform 0.3s;
+    }
+
+    .nav-logo:hover i {
+        transform: scale(1.1);
+    }
+
+    .nav-logo:hover {
+        color: white;
+    }
+
+    /* Menu horizontal */
+    .nav-menu {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 5px;
+    }
+
+    .nav-menu li {
+        margin: 0;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 10px 20px;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .nav-link:hover {
+        background: #FF6600;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: #FF6600;
+        color: white;
+        box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+    }
+
+    /* Bouton Don spécial */
+    .nav-don {
+        background: #CC3300;
+        color: white !important;
+        font-weight: 600;
+        padding: 10px 25px !important;
+        margin-left: 10px;
+        border: 2px solid #FF6600;
+    }
+
+    .nav-don:hover {
+        background: #FF6600;
+        border-color: #CC3300;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
+    }
+
+    /* Bouton mobile caché sur desktop */
+    .nav-mobile-btn {
+        display: none;
+        background: none;
+        border: 2px solid #FF6600;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .nav-mobile-btn span {
+        display: block;
+        width: 25px;
+        height: 2px;
+        background: white;
+        margin: 5px 0;
+        transition: 0.3s;
+    }
+
+    /* Responsive pour mobile/tablette */
+    @media screen and (max-width: 992px) {
+        .nav-mobile-btn {
+            display: block;
+        }
+
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: #003366;
+            flex-direction: column;
+            padding: 20px;
+            gap: 10px;
+            border-bottom: 3px solid #FF6600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-menu.show {
+            display: flex;
+        }
+
+        .nav-link {
+            text-align: center;
+            padding: 15px !important;
+            width: 100%;
+        }
+
+        .nav-don {
+            margin: 10px 0 0 0 !important;
+        }
+
+        /* Animation du bouton mobile */
+        .nav-mobile-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .nav-mobile-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-mobile-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+    }
+
+    /* Desktop seulement - horizontal garanti */
+    @media screen and (min-width: 993px) {
+        .nav-menu {
+            display: flex !important;
+            flex-direction: row;
+        }
+    }
