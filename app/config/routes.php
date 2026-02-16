@@ -343,6 +343,9 @@ $router->group('', function (Router $router) use ($app) {
         $besoins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         \Flight::json($besoins);
     });
+    $router->get('/simulation', function () use ($app) {
+    $app->render('simulation'); // affichera app/views/simulation.php
+});
 }, [SecurityHeadersMiddleware::class]);
 
 
