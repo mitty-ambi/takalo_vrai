@@ -17,6 +17,7 @@
         </select>
         <p>Quantite : <input type="number" name="quantite"></p>
         <p>Date_don : <input type="date" name="date_don"></p>
+        <input type="submit" value="Valider le don">
     </form>
 </body>
 </html>
