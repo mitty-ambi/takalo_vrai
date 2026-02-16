@@ -22,7 +22,7 @@ class BesoinController
             }
 
             $besoin = new Besoin(null, $id_matiere, $id_ville, $quantite);
-            
+
             if ($besoin->insert_base()) {
                 return [
                     'success' => true,
@@ -56,5 +56,9 @@ class BesoinController
     public static function update($id_besoin, $id_matiere, $id_ville, $quantite)
     {
         return \app\models\Besoin::update($id_besoin, $id_matiere, $id_ville, $quantite);
+    }
+    public static function getBesoinVIlle($id_ville)
+    {
+        return Besoin::getBesoinVIlle($id_ville);
     }
 }
