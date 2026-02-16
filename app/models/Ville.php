@@ -28,11 +28,26 @@ class Ville
         return $stmt->execute();
     }
 
-    public static function getAll()
+    /**
+     * Get all villes, optionally filtered by name.
+     *
+     * @param string|null $nom if provided, performs a LIKE %nom% filter on Ville.nom_ville
+     * @return array
+     */
+    public static function getAll($nom = null)
     {
         $DBH = \Flight::db();
-        $query = "SELECT * FROM Ville JOIN Region ON Ville.id_region = Region.id_region";
-        $stmt = $DBH->query($query);
+
+        if ($nom === null || $nom === '') {
+            $query = "SELECT * FROM Ville JOIN Region ON Ville.id_region = Region.id_region";
+            $stmt = $DBH->query($query);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        $query = "SELECT * FROM Ville JOIN Region ON Ville.id_region = Region.id_region WHERE Ville.nom_ville LIKE :nom";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':nom', '%' . $nom . '%', PDO::PARAM_STR);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
