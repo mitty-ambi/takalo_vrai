@@ -9,7 +9,7 @@
 
 <body>
     <h1>Gestion de sinistrés</h1>
-    
+    kljkhjgv
 </body>
 
 </html>
