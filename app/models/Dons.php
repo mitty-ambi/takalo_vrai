@@ -21,6 +21,17 @@ class Dons
         $this->id_ville = $id_ville;
     }
 
+    public static function getDonsVille($id_ville)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Dons JOIN Matiere ON Dons.id_matiere = Matiere.id_matiere WHERE id_ville = ?");
+        $sql->bindValue(1, $id_ville, PDO::PARAM_INT);
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
     public function insert_base()
     {
         $DBH = \Flight::db();

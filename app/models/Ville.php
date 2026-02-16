@@ -4,6 +4,8 @@ namespace app\models;
 
 use PDO;
 
+class Ville
+{
 class Ville{
     public $id_ville;
     public $nom_ville;
@@ -30,8 +32,23 @@ class Ville{
     public static function getAll()
     {
         $DBH = \Flight::db();
-        $query = "SELECT * FROM Ville";
+        $query = "SELECT * FROM Ville JOIN Region ON Ville.id_region = Region.id_region";
         $stmt = $DBH->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public static function getNomVIlle($id_ville)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT nom_ville FROM Ville WHERE id_ville = ?");
+        $sql->bindValue(1, $id_ville, PDO::PARAM_INT);
+        $sql->execute();
+        $nom = $sql->fetch(PDO::FETCH_ASSOC);
+        if ($nom) {
+            return $nom['nom_ville'];
+        }
+        return null;
+    }
+}
+
+?>
 }

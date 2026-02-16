@@ -71,4 +71,16 @@ class Besoin
         $stmt->bindValue(':quantite', $quantite);
         return $stmt->execute();
     }
+    public static function getBesoinVIlle($id_ville)
+    {
+        $DBH = \Flight::db();
+        $sql = $DBH->prepare("SELECT * FROM Besoin JOIN Matiere ON Besoin.id_matiere = Matiere.id_matiere WHERE id_ville = ?");
+        $sql->bindValue(1, $id_ville, PDO::PARAM_INT);
+        $sql->execute();
+        $data = [];
+        while ($x = $sql->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $x;
+        }
+        return $data;
+    }
 }

@@ -1,4 +1,7 @@
 <?php
+use app\controllers\BesoinController;
+use app\controllers\DonsController;
+use app\models\Ville;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
@@ -16,7 +19,14 @@ ini_set('display_startup_errors', 1);
 
 $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
-        $app->render('index', ['ls_donnees_prod' => 'a']);
+        $listeVille = Ville::getAll();
+        $app->render('index', ['listeVille' => $listeVille]);
+    });
+    $router->get('/StatsVille', function () use ($app) {
+        $id_ville = $_GET['id_ville'];
+        $listeBesoin = BesoinController::getBesoinVIlle($id_ville);
+        $listeDons = DonsController::getDonsVille($id_ville);
+        $app->render('StatsVille', ['listeBesoin' => $listeBesoin, 'listeDons' => $listeDons, 'nomville' => Ville::getNomVIlle($id_ville)]);
     });
     $router->get('/gerer_besoins', function () use ($app) {
         $villes = \app\models\Ville::getAll();
