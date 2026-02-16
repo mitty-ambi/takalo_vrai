@@ -6,6 +6,8 @@
     <title>Document</title>
 </head>
 <body>
+    <?php include("navbar.php");?>
     <h1>Creer un besoin</h1>
+    <p></p>
 </body>
 </html>
