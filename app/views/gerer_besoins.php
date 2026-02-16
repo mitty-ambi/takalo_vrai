@@ -32,11 +32,23 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="id_categorie">Catégorie:</label>
+                    <select name="id_categorie" id="id_categorie" required>
+                        <option value="">-- Sélectionner une catégorie --</option>
+                        <?php foreach ($categories as $categorie): ?>
+                            <option value="<?= htmlspecialchars($categorie['id_categorie']) ?>">
+                                <?= htmlspecialchars($categorie['nom_categorie']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="id_matiere">Matière:</label>
                     <select name="id_matiere" id="id_matiere" required>
                         <option value="">-- Sélectionner une matière --</option>
                         <?php foreach ($matieres as $matiere): ?>
-                            <option value="<?= htmlspecialchars($matiere['id_matiere']) ?>">
+                            <option value="<?= htmlspecialchars($matiere['id_matiere']) ?>" data-categorie="<?= htmlspecialchars($matiere['id_categorie']) ?>">
                                 <?= htmlspecialchars($matiere['nom_matiere']) ?>
                             </option>
                         <?php endforeach; ?>
@@ -54,5 +66,32 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById('id_categorie').addEventListener('change', function() {
+            const selectedCategorie = this.value;
+            const matiereSelect = document.getElementById('id_matiere');
+            const options = matiereSelect.querySelectorAll('option');
+
+            // Reset to first empty option
+            options.forEach(option => {
+                if (option.value === '') {
+                    option.style.display = 'block';
+                } else {
+                    const optionCategorie = option.getAttribute('data-categorie');
+                    if (selectedCategorie === '') {
+                        option.style.display = 'block';
+                    } else if (optionCategorie === selectedCategorie) {
+                        option.style.display = 'block';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Reset selected value
+            matiereSelect.value = '';
+        });
+    </script>
 </body>
 </html>
