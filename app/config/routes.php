@@ -307,22 +307,22 @@ $router->group('', function (Router $router) use ($app) {
     // API pour stats récapitulatives globales
     $router->get('/api/stats/recap', function () use ($app) {
         $DBH = \Flight::db();
-        
+
         // Besoins totaux en montant
         $query_total = "SELECT COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total
                         FROM Besoin b
                         JOIN Matiere m ON b.id_matiere = m.id_matiere";
         $total = $DBH->query($query_total)->fetch(\PDO::FETCH_ASSOC);
-        
+
         // Besoins satisfaits en montant
         $query_satisfait = "SELECT COALESCE(SUM(d.quantite * m.prix_unitaire), 0) as montant_satisfait
                            FROM Dons d
                            JOIN Matiere m ON d.id_matiere = m.id_matiere";
         $satisfait = $DBH->query($query_satisfait)->fetch(\PDO::FETCH_ASSOC);
-        
+
         // Besoins restants
         $montant_restant = $total['montant_total'] - $satisfait['montant_satisfait'];
-        
+
         \Flight::json([
             'montant_total' => (float) $total['montant_total'],
             'montant_satisfait' => (float) $satisfait['montant_satisfait'],
@@ -344,8 +344,8 @@ $router->group('', function (Router $router) use ($app) {
         \Flight::json($besoins);
     });
     $router->get('/simulation', function () use ($app) {
-    $app->render('simulation'); // affichera app/views/simulation.php
-});
+        $app->render('simulation'); // affichera app/views/simulation.php
+    });
 }, [SecurityHeadersMiddleware::class]);
 
 

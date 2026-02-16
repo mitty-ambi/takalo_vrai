@@ -78,11 +78,11 @@ return [
 	 *         Database Settings          *
 	 **************************************/
 	'database' => [
-		'host' => '127.0.0.1',      // DB host
+		'host' => '172.16.7.131',      // DB host
 		'port' => 3306,
-		'dbname' => 'bngrc',       // Database name
-		'user' => 'root',       // DB user
-		'password' => '',   // DB password
+		'dbname' => 'db_s2_ETU003943',       // Database name
+		'user' => 'ETU003943',       // DB user
+		'password' => 'ZXFQM6vH',   // DB password
 		// SQLite Example:
 		// 'file_path' => __DIR__ . $ds . '..' . $ds . 'database.sqlite', // Path to SQLite file
 	],
