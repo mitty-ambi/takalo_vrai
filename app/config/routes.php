@@ -162,5 +162,11 @@ $router->group('', function (Router $router) use ($app) {
 
         $app->redirect('/crud_dons');
     });
+    $router->post('/registre', function () use ($app) {
+
+        $result = \app\controllers\BesoinController::create();
+        
+        \Flight::json($result);
+    });
 }, [SecurityHeadersMiddleware::class]);
 
