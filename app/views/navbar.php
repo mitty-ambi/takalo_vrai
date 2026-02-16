@@ -1,8 +1,9 @@
-<!-- navbar.html -->
+<?php $base_url = rtrim(Flight::get('flight.base_url'), '/'); ?>
+<!-- navbar -->
 <nav class="bngrc-navbar">
     <div class="container">
         <div class="nav-wrapper">
-            <a href="index.html" class="nav-logo">
+            <a href="<?= $base_url ?>/" class="nav-logo">
                 <i class="fas fa-hand-holding-heart"></i>
                 <span>BNGRC</span>
             </a>
@@ -14,12 +15,13 @@
             </button>
 
             <ul class="nav-menu" id="navMenu">
-                <li><a href="/" class="nav-link active">Accueil</a></li>
-                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                <li><a href="/gerer_besoins" class="nav-link">Besoins</a></li>
-                <li><a href="/crud_dons" class="nav-link">Dons</a></li>
-                <li><a href="/dispatch" class="nav-link">Dispatch</a></li>
-                <li><a href="/gerer_dons" class="nav-link nav-don">Donner</a></li>
+                <li><a href="<?= $base_url ?>/" class="nav-link active">Accueil</a></li>
+                <li><a href="<?= $base_url ?>/gerer_besoins" class="nav-link">Besoins</a></li>
+                <li><a href="<?= $base_url ?>/gerer_achats" class="nav-link">💰 Achats</a></li>
+                <li><a href="<?= $base_url ?>/simulation" class="nav-link">🛒 Simulation</a></li>
+                <li><a href="<?= $base_url ?>/crud_dons" class="nav-link">Dons</a></li>
+                <li><a href="<?= $base_url ?>/dispatch" class="nav-link">Dispatch</a></li>
+                <li><a href="<?= $base_url ?>/gerer_dons" class="nav-link nav-don">Donner</a></li>
             </ul>
         </div>
     </div>

@@ -20,14 +20,47 @@ create table Dons(
 create table Matiere(
     id_matiere int primary key auto_increment,
     nom_matiere varchar(100),
-    prix_unitaire float
+    prix_unitaire float,
+    id_categorie INT,
 );
+ALTER TABLE Matiere ADD id_categorie INT
 create table Besoin(
     id_besoin int primary key auto_increment,
     id_matiere int,
     quantite int,
     id_ville int
 );
+
+create table Achats(
+    id_achat int primary key auto_increment,
+    id_besoin int,
+    id_ville int,
+    id_matiere int,
+    quantite int,
+    prix_unitaire float,
+    frais_pourcentage float,
+    prix_total_achat float,
+    date_achat datetime default current_timestamp,
+    statut varchar(50) default 'en_attente'
+);
+
+CREATE TABLE Categorie(
+    id_categorie INT primary key auto_increment,
+    nom varchar(100)
+);
+-- 3. Insertion des matières
+INSERT INTO Matiere (nom_matiere, prix_unitaire, id_categorie) VALUES
+-- EN NATURE (id_categorie = 1)
+('Riz', 2500, 1),
+('Huile', 5000, 1),
+('Sucre', 1800, 1),
+('Farine', 1200, 1),
+('Lait', 3000, 1),
+('Pâtes', 1500, 1),
+('Sel', 500, 1),
+('Eau minérale', 1000, 1),
+('Biscuits', 500, 1),
+('Conserves', 2000, 1),
 
 -- 1. Insertion des régions
 INSERT INTO Region (nom_region) VALUES

@@ -1,15 +1,19 @@
+<?php $base_url = rtrim(Flight::get('flight.base_url'), '/'); ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/assets/css/navbar.css">
-    <link rel="stylesheet" href="/assets/css/crud_dons_page.css">
+    <link rel="stylesheet" href="<?= $base_url ?>/assets/css/all.min.css">
+    <link rel="stylesheet" href="<?= $base_url ?>/assets/css/navbar.css">
+    <link rel="stylesheet" href="<?= $base_url ?>/assets/css/crud_dons_page.css">
     <title>Gérer les Dons - BNGRC</title>
 </head>
+
 <body>
     <?php include("navbar.php"); ?>
-    
+
     <div class="container">
         <div class="page-header">
             <h1>📋 Gestion des Dons</h1>
@@ -50,7 +54,8 @@
                             </div>
                             <div class="info-row">
                                 <div class="info-label">PRIX UNITAIRE:</div>
-                                <div class="info-value"><?= number_format((float)$don['prix_unitaire'], 2, ',', ' ') ?> Ar</div>
+                                <div class="info-value"><?= number_format((float) $don['prix_unitaire'], 2, ',', ' ') ?> Ar
+                                </div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">DATE DON:</div>
@@ -62,7 +67,8 @@
                                     <?php if ($don['id_ville'] == 0): ?>
                                         <span class="badge-pending">⏳ En attente</span>
                                     <?php else: ?>
-                                        <span class="badge-assigned">✓ <?= htmlspecialchars($don['nom_ville'] ?? 'Ville #' . $don['id_ville']) ?></span>
+                                        <span class="badge-assigned">✓
+                                            <?= htmlspecialchars($don['nom_ville'] ?? 'Ville #' . $don['id_ville']) ?></span>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -70,12 +76,13 @@
 
                         <div class="don-card-actions">
                             <!-- Bouton Modifier -->
-                            <a href="/crud_dons/edit/<?= $don['id_don'] ?>" class="btn btn-edit">
+                            <a href="<?= $base_url ?>/crud_dons/edit/<?= $don['id_don'] ?>" class="btn btn-edit">
                                 ✏️ Modifier
                             </a>
 
                             <!-- Formulaire Supprimer -->
-                            <form method="POST" action="/crud_dons/delete" class="form-delete" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce don?');">
+                            <form method="POST" action="<?= $base_url ?>/crud_dons/delete" class="form-delete"
+                                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce don?');">
                                 <input type="hidden" name="id_don" value="<?= htmlspecialchars($don['id_don']) ?>">
                                 <button type="submit" class="btn btn-delete">
                                     🗑️ Supprimer
@@ -88,4 +95,5 @@
         </div>
     </div>
 </body>
+
 </html>

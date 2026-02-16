@@ -74,11 +74,7 @@ class Besoin
     public static function getBesoinVIlle($id_ville)
     {
         $DBH = \Flight::db();
-        $sql = $DBH->prepare("SELECT b.*, m.nom_matiere, m.id_categorie, c.nom_categorie 
-                              FROM Besoin b 
-                              JOIN Matiere m ON b.id_matiere = m.id_matiere 
-                              LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie 
-                              WHERE b.id_ville = ?");
+        $sql = $DBH->prepare("SELECT * FROM Besoin JOIN Matiere ON Besoin.id_matiere = Matiere.id_matiere WHERE id_ville = ?");
         $sql->bindValue(1, $id_ville, PDO::PARAM_INT);
         $sql->execute();
         $data = [];

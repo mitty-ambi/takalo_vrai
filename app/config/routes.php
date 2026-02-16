@@ -1,7 +1,8 @@
 <?php
 use app\controllers\BesoinController;
 use app\controllers\DonsController;
-use app\controllers\DashboardController;
+use app\controllers\AchatController;
+use app\controllers\CategorieController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
@@ -9,8 +10,7 @@ use app\models\Matiere;
 use app\models\Dons;
 use app\models\Ville;
 use app\models\Besoin;
-use app\models\Categorie;
-use Flight;
+use app\models\Achat;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -23,6 +23,7 @@ ini_set('display_startup_errors', 1);
 $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
         // optional search filter by city name
+        $a = 0;
         $search = trim($_GET['nom_ville'] ?? '');
         $listeVille = Ville::getAll();
         if ($search !== '') {
@@ -34,34 +35,39 @@ $router->group('', function (Router $router) use ($app) {
     });
     $router->get('/StatsVille', function () use ($app) {
         $id_ville = $_GET['id_ville'];
-        $listeBesoin = BesoinController::getBesoinVIlle($id_ville);
-        $listeDons = DonsController::getDonsVille($id_ville);
-        $app->render('StatsVille', ['listeBesoin' => $listeBesoin, 'listeDons' => $listeDons, 'nomville' => Ville::getNomVIlle($id_ville)]);
+        $listeBesoin = BesoinController::getBesoinVilleGrouped($id_ville);
+        $listeDons = DonsController::getDonsVilleGrouped($id_ville);
+        $besoinRestant = DonsController::getBesoinRestantVille($id_ville);
+        $app->render('StatsVille', ['listeBesoin' => $listeBesoin, 'listeDons' => $listeDons, 'besoinRestant' => $besoinRestant, 'nomville' => Ville::getNomVIlle($id_ville)]);
     });
     $router->get('/gerer_besoins', function () use ($app) {
         $villes = \app\models\Ville::getAll();
-        $categories = \app\models\Categorie::getAll();
         $matieres = \app\models\Matiere::getAll();
+        $categorie = CategorieController::getAll();
         $app->render('gerer_besoins', [
             'villes' => $villes,
-            'categories' => $categories,
-            'matieres' => $matieres
+            'matieres' => $matieres,
+            'categories' => $categorie
         ]);
     });
     $router->get('/gerer_dons', function () use ($app) {
         $matieres = \app\models\Matiere::getAll();
-        $categories = \app\models\Categorie::getAll();
         $app->render('gerer_dons', [
-            'matieres' => $matieres,
-            'categories' => $categories
+            'matieres' => $matieres
         ]);
     });
     $router->get('/valider_dons', function () use ($app) {
         $matieres = \app\models\Matiere::getAll();
-        $categories = \app\models\Categorie::getAll();
         $app->render('gerer_dons', [
-            'matieres' => $matieres,
-            'categories' => $categories
+            'matieres' => $matieres
+        ]);
+    });
+    $router->get('/simulation', function () use ($app) {
+        $villes = \app\models\Ville::getAll();
+        $matieres = \app\models\Matiere::getAll();
+        $app->render('simulation', [
+            'villes' => $villes,
+            'matieres' => $matieres
         ]);
     });
     $router->get('/dispatch', function () use ($app) {
@@ -73,7 +79,7 @@ $router->group('', function (Router $router) use ($app) {
         ]);
     });
     $router->post('/valider_dons', function () use ($app) {
-        $id_matiere = $_POST['id_matiere'] ?? null;
+        $id_matiere = $_POST['matiere'] ?? null;
         $quantite = $_POST['quantite'] ?? null;
         $date_don = $_POST['date_don'] ?? null;
 
@@ -132,8 +138,7 @@ $router->group('', function (Router $router) use ($app) {
 
         $matieres = \app\models\Matiere::getAll();
         $villes = \app\models\Ville::getAll();
-        $categories = \app\models\Categorie::getAll();
-
+        $categories = CategorieController::getAll();
         $app->render('edit_don', [
             'don' => $don,
             'matieres' => $matieres,
@@ -186,6 +191,157 @@ $router->group('', function (Router $router) use ($app) {
         $result = \app\controllers\BesoinController::create();
 
         \Flight::json($result);
+    });
+
+    // Routes pour les achats
+    $router->get('/gerer_achats', function () use ($app) {
+        $filter_ville = $_GET['id_ville'] ?? null;
+        $filter_statut = $_GET['statut'] ?? null;
+
+        $villes = Ville::getAll();
+        $achats = Achat::getAll();
+
+        // Filtrer par ville
+        if ($filter_ville) {
+            $achats = array_filter($achats, function ($a) use ($filter_ville) {
+                return $a['id_ville'] == $filter_ville;
+            });
+        }
+
+        // Filtrer par statut
+        if ($filter_statut) {
+            $achats = array_filter($achats, function ($a) use ($filter_statut) {
+                return $a['statut'] === $filter_statut;
+            });
+        }
+
+        $app->render('gerer_achats', [
+            'achats' => array_values($achats),
+            'villes' => $villes,
+            'filter_ville' => $filter_ville,
+            'filter_statut' => $filter_statut
+        ]);
+    });
+
+    $router->post('/gerer_achats/create', function () use ($app) {
+        $id_besoin = $_POST['id_besoin'] ?? null;
+        $quantite = $_POST['quantite'] ?? null;
+
+        if (!$id_besoin) {
+            $app->redirect('/gerer_besoins?error=Besoin requis');
+            return;
+        }
+
+        $result = AchatController::createFromBesoin($id_besoin, $quantite);
+
+        if ($result['success']) {
+            $app->redirect('/gerer_achats?success=' . urlencode($result['message']));
+        } else {
+            $app->redirect('/gerer_besoins?error=' . urlencode($result['message']));
+        }
+    });
+
+    $router->post('/gerer_achats/delete', function () use ($app) {
+        $id_achat = $_POST['id_achat'] ?? null;
+
+        if (!$id_achat) {
+            error_log('[ERROR] ID achat manquant pour suppression');
+            $app->redirect('/gerer_achats');
+            return;
+        }
+
+        if (AchatController::delete($id_achat)) {
+            error_log('[SUCCESS] Achat #' . $id_achat . ' supprimé avec succès');
+        } else {
+            error_log('[ERROR] Erreur lors de la suppression de l\'achat');
+        }
+
+        $app->redirect('/gerer_achats');
+    });
+
+    // API pour acheter un besoin (AJAX)
+    $router->post('/api/achats/create', function () use ($app) {
+        $id_matiere = $_POST['id_matiere'] ?? null;
+        $id_ville = $_POST['id_ville'] ?? null;
+        $montant = $_POST['montant'] ?? null;
+
+        if (!$id_matiere || !$id_ville || !$montant) {
+            \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
+            return;
+        }
+
+        $result = AchatController::creerAchat($id_matiere, $id_ville, (float) $montant);
+        \Flight::json($result);
+    });
+
+    // API pour simuler un achat (prévisualisation)
+    $router->post('/api/achats/simuler', function () use ($app) {
+        $id_matiere = $_POST['id_matiere'] ?? null;
+        $id_ville = $_POST['id_ville'] ?? null;
+        $montant = $_POST['montant'] ?? null;
+
+        if (!$id_matiere || !$id_ville || !$montant) {
+            \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
+            return;
+        }
+
+        $result = AchatController::simulerAchat($id_matiere, $id_ville, (float) $montant);
+        \Flight::json($result);
+    });
+
+    // API pour valider et enregistrer un achat
+    $router->post('/api/achats/valider', function () use ($app) {
+        $id_matiere = $_POST['id_matiere'] ?? null;
+        $id_ville = $_POST['id_ville'] ?? null;
+        $montant = $_POST['montant'] ?? null;
+
+        if (!$id_matiere || !$id_ville || !$montant) {
+            \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
+            return;
+        }
+
+        $result = AchatController::validerAchat($id_matiere, $id_ville, (float) $montant);
+        \Flight::json($result);
+    });
+
+    // API pour stats récapitulatives globales
+    $router->get('/api/stats/recap', function () use ($app) {
+        $DBH = \Flight::db();
+        
+        // Besoins totaux en montant
+        $query_total = "SELECT COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total
+                        FROM Besoin b
+                        JOIN Matiere m ON b.id_matiere = m.id_matiere";
+        $total = $DBH->query($query_total)->fetch(\PDO::FETCH_ASSOC);
+        
+        // Besoins satisfaits en montant
+        $query_satisfait = "SELECT COALESCE(SUM(d.quantite * m.prix_unitaire), 0) as montant_satisfait
+                           FROM Dons d
+                           JOIN Matiere m ON d.id_matiere = m.id_matiere";
+        $satisfait = $DBH->query($query_satisfait)->fetch(\PDO::FETCH_ASSOC);
+        
+        // Besoins restants
+        $montant_restant = $total['montant_total'] - $satisfait['montant_satisfait'];
+        
+        \Flight::json([
+            'montant_total' => (float) $total['montant_total'],
+            'montant_satisfait' => (float) $satisfait['montant_satisfait'],
+            'montant_restant' => (float) $montant_restant
+        ]);
+    });
+
+    // API pour récupérer les besoins restants (non achetés)
+    $router->get('/api/besoins/remaining', function () use ($app) {
+        $DBH = \Flight::db();
+        $query = "SELECT b.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
+                  FROM Besoin b
+                  JOIN Matiere m ON b.id_matiere = m.id_matiere
+                  JOIN Ville v ON b.id_ville = v.id_ville
+                  WHERE b.id_besoin NOT IN (SELECT id_besoin FROM Achats WHERE id_besoin IS NOT NULL)
+                  ORDER BY v.nom_ville, m.nom_matiere";
+        $stmt = $DBH->query($query);
+        $besoins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        \Flight::json($besoins);
     });
 }, [SecurityHeadersMiddleware::class]);
 
