@@ -121,4 +121,36 @@ class Dons
         $stmt = $DBH->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Récupérer tous les dons avec le nom de la matière
+     */
+    public static function getAllWithMatiere()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT d.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
+                  FROM Dons d 
+                  JOIN Matiere m ON d.id_matiere = m.id_matiere 
+                  LEFT JOIN Ville v ON d.id_ville = v.id_ville
+                  ORDER BY d.date_don DESC";
+        $stmt = $DBH->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Récupérer un don par ID avec le nom de la matière
+     */
+    public static function getByIdWithMatiere($id_don)
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT d.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
+                  FROM Dons d 
+                  JOIN Matiere m ON d.id_matiere = m.id_matiere 
+                  LEFT JOIN Ville v ON d.id_ville = v.id_ville
+                  WHERE d.id_don = :id_don";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_don', (int) $id_don, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

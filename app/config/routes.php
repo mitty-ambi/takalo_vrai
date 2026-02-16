@@ -85,5 +85,73 @@ $router->group('', function (Router $router) use ($app) {
             $app->redirect('/dispatch');
         }
     });
+
+    $router->get('/crud_dons', function () use ($app) {
+        $dons = \app\models\Dons::getAllWithMatiere();
+        $app->render('crud_dons', [
+            'dons' => $dons
+        ]);
+    });
+
+    $router->get('/crud_dons/edit/@id_don', function ($id_don) use ($app) {
+        $don = \app\models\Dons::getByIdWithMatiere($id_don);
+        
+        if (!$don) {
+            $app->render('crud_dons', [
+                'dons' => \app\models\Dons::getAllWithMatiere(),
+                'message_error' => 'Don non trouvé'
+            ]);
+            return;
+        }
+
+        $matieres = \app\models\Matiere::getAll();
+        $villes = \app\models\Ville::getAll();
+
+        $app->render('edit_don', [
+            'don' => $don,
+            'matieres' => $matieres,
+            'villes' => $villes
+        ]);
+    });
+
+    $router->post('/crud_dons/update', function () use ($app) {
+        $id_don = $_POST['id_don'] ?? null;
+        $id_matiere = $_POST['id_matiere'] ?? null;
+        $quantite = $_POST['quantite'] ?? null;
+        $date_don = $_POST['date_don'] ?? null;
+        $id_ville = $_POST['id_ville'] ?? null;
+
+        if (!$id_don || !$id_matiere || !$quantite || !$date_don) {
+            error_log('[ERROR] Champs manquants pour update don');
+            $app->redirect('/crud_dons');
+            return;
+        }
+
+        if (\app\models\Dons::update($id_don, $id_matiere, $quantite, $date_don, $id_ville)) {
+            error_log('[SUCCESS] Don #' . $id_don . ' mis à jour avec succès');
+            $app->redirect('/crud_dons');
+        } else {
+            error_log('[ERROR] Erreur lors de la mise à jour du don');
+            $app->redirect('/crud_dons');
+        }
+    });
+
+    $router->post('/crud_dons/delete', function () use ($app) {
+        $id_don = $_POST['id_don'] ?? null;
+
+        if (!$id_don) {
+            error_log('[ERROR] ID don manquant pour suppression');
+            $app->redirect('/crud_dons');
+            return;
+        }
+
+        if (\app\models\Dons::delete($id_don)) {
+            error_log('[SUCCESS] Don #' . $id_don . ' supprimé avec succès');
+        } else {
+            error_log('[ERROR] Erreur lors de la suppression du don');
+        }
+
+        $app->redirect('/crud_dons');
+    });
 }, [SecurityHeadersMiddleware::class]);
 
