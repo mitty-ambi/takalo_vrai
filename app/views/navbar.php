@@ -17,9 +17,9 @@
                 <li><a href="index.html" class="nav-link active">Accueil</a></li>
                 <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
                 <li><a href="besoins.html" class="nav-link">Besoins</a></li>
-                <li><a href="dons.html" class="nav-link">Dons</a></li>
-                <li><a href="dispatch.html" class="nav-link">Dispatch</a></li>
-                <li><a href="donner.html" class="nav-link nav-don">Donner</a></li>
+                <li><a href="/gerer_dons" class="nav-link">Dons</a></li>
+                <li><a href="/dispatch" class="nav-link">Dispatch</a></li>
+                <li><a href="/gerer_dons" class="nav-link nav-don">Donner</a></li>
             </ul>
         </div>
     </div>

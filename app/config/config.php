@@ -68,7 +68,7 @@ return [
 	'database' => [
 		'host' => '127.0.0.1',      // DB host
 		'port' => 3306,
-		'dbname' => 'takalo',       // Database name
+		'dbname' => 'bngrc',       // Database name
 		'user' => 'root',       // DB user
 		'password' => '',   // DB password
 		// SQLite Example:

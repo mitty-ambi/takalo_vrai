@@ -1,4 +1,9 @@
 <?php
+
+namespace app\models;
+
+use PDO;
+
 class Ville{
     public $id_ville;
     public $nom_ville;
@@ -30,5 +35,3 @@ class Ville{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-
-?>
