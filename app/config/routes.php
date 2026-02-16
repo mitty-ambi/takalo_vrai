@@ -27,8 +27,12 @@ $router->group('', function (Router $router) use ($app) {
         $app->render('register', ['ls_donnees_prod' => 'a']);
     });
     $router->get('/gerer_besoins', function () use ($app) {
-        
-        $app->render('gerer_besoins');
+        $villes = \app\models\Ville::getAll();
+        $matieres = \app\models\Matiere::getAll();
+        $app->render('gerer_besoins', [
+            'villes' => $villes,
+            'matieres' => $matieres
+        ]);
     });
 }, [SecurityHeadersMiddleware::class]);
 
