@@ -69,8 +69,13 @@ class DispatchController
 
             error_log('[DEBUG] Total updates effectués: ' . $total_updates);
 
+            // Supprimer les dons avec quantité 0 (résidus du dispatch)
+            $query_delete_zeros = "DELETE FROM Dons WHERE quantite <= 0";
+            $deleted_count = $DBH->exec($query_delete_zeros);
+            error_log('[DEBUG] Dons avec quantité 0 supprimés: ' . $deleted_count);
+
             $DBH->commit();
-            return ['success' => true, 'message' => 'Dispatch validé avec succès (' . $total_updates . ' updates)'];
+            return ['success' => true, 'message' => 'Dispatch validé avec succès (' . $total_updates . ' splits, ' . $deleted_count . ' dons supprimés)'];
         } catch (\Exception $e) {
             error_log('[ERROR] Exception dans validerDispatch: ' . $e->getMessage());
             $DBH->rollBack();

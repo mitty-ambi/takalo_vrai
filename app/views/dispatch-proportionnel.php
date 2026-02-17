@@ -311,11 +311,7 @@
 
                     <!-- Bouton pour valider cette matière -->
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <form method="POST" action="<?= $base_url ?>/api/dispatch/valider-matiere" style="flex: 1;">
-                            <input type="hidden" name="id_matiere" value="<?= $id_matiere ?>">
-                            <button type="submit" class="btn btn-valider" style="width: 100%; background: #FF6600;">✓
-                                Valider cette matière</button>
-                        </form>
+                        <button type="button" class="btn btn-valider btn-valider-matiere" style="width: 100%; background: #FF6600;" data-id-matiere="<?= $id_matiere ?>">✓ Valider cette matière</button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -326,7 +322,33 @@
         </form>
     </div>
 
-    <script>
+    <script nonce="<?= Flight::app()->get('csp_nonce') ?>">
+        function validerMatiere(id_matiere) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<?= $base_url ?>/api/dispatch/valider-matiere';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'id_matiere';
+            input.value = id_matiere;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Attacher les event listeners aux boutons "Valider cette matière"
+        document.querySelectorAll('.btn-valider-matiere').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const id_matiere = this.getAttribute('data-id-matiere');
+                console.log('Valider matière:', id_matiere);
+                validerMatiere(parseInt(id_matiere));
+            });
+        });
+
         document.getElementById('dispatchForm').addEventListener('submit', function (e) {
             e.preventDefault();
 

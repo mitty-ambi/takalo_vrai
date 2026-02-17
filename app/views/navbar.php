@@ -32,7 +32,7 @@
                     </ul>
                 </li>
 
-                <li><a href="<?= $base_url ?>/api/stats/recap" class="nav-link">Récap</a></li>
+                <li><a href="<?= $base_url ?>/recap" class="nav-link">Récap</a></li>
                 <li><a href="<?= $base_url ?>/gerer_dons" class="nav-link btn-don">Donner</a></li>
             </ul>
         </div>
