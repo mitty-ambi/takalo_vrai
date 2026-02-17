@@ -83,6 +83,8 @@
             <a href="<?= $base_url ?>/crud_dons" class="btn btn-secondary">← Retour</a>
         <?php endif; ?>
     </div>
+    <?php include("footer.php") ?>
+
 </body>
 
 </html>

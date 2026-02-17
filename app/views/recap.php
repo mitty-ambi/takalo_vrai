@@ -59,7 +59,8 @@
             <h2 style="color: #333; margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
                 📍 Détails par Ville
             </h2>
-            <div id="villesContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            <div id="villesContent"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
                 <!-- Chargé via AJAX -->
                 <p style="text-align: center; color: #999;">Chargement...</p>
             </div>
@@ -94,7 +95,7 @@
                     document.getElementById('totalRestant').textContent = formatMontant(data.montant_restant);
 
                     // Calculer le pourcentage
-                    const pourcentage = data.montant_total > 0 
+                    const pourcentage = data.montant_total > 0
                         ? Math.round((data.montant_satisfait / data.montant_total) * 100)
                         : 0;
                     document.getElementById('pourcentageSatisfaction').textContent = pourcentage + '%';
@@ -126,7 +127,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('villesContent');
-                    
+
                     if (!Array.isArray(data) || data.length === 0) {
                         container.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">Aucune données disponible</p>';
                         return;
@@ -134,7 +135,7 @@
 
                     let html = '';
                     data.forEach(ville => {
-                        const pourcentageVille = ville.montant_total > 0 
+                        const pourcentageVille = ville.montant_total > 0
                             ? Math.round((ville.montant_satisfait / ville.montant_total) * 100)
                             : 0;
 
@@ -174,7 +175,7 @@
         }
 
         // Initialiser au chargement
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             actualiserRecap();
 
             // Actualiser toutes les 10 secondes
@@ -184,6 +185,8 @@
             document.getElementById('btnActualiser').addEventListener('click', actualiserRecap);
         });
     </script>
+    <?php include("footer.php"); ?>
+
 </body>
 
 </html>
