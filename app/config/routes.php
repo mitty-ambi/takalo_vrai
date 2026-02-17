@@ -3,6 +3,7 @@ use app\controllers\BesoinController;
 use app\controllers\DonsController;
 use app\controllers\AchatController;
 use app\controllers\CategorieController;
+use app\controllers\DispatchController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
@@ -11,6 +12,7 @@ use app\models\Dons;
 use app\models\Ville;
 use app\models\Besoin;
 use app\models\Achat;
+use app\models\Stats;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -330,41 +332,13 @@ $router->group('', function (Router $router) use ($app) {
 
     // API pour stats récapitulatives globales
     $router->get('/api/stats/recap', function () use ($app) {
-        $DBH = \Flight::db();
-
-        // Besoins totaux en montant
-        $query_total = "SELECT COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total
-                        FROM Besoin b
-                        JOIN Matiere m ON b.id_matiere = m.id_matiere";
-        $total = $DBH->query($query_total)->fetch(\PDO::FETCH_ASSOC);
-
-        // Besoins satisfaits en montant
-        $query_satisfait = "SELECT COALESCE(SUM(d.quantite * m.prix_unitaire), 0) as montant_satisfait
-                           FROM Dons d
-                           JOIN Matiere m ON d.id_matiere = m.id_matiere";
-        $satisfait = $DBH->query($query_satisfait)->fetch(\PDO::FETCH_ASSOC);
-
-        // Besoins restants
-        $montant_restant = $total['montant_total'] - $satisfait['montant_satisfait'];
-
-        \Flight::json([
-            'montant_total' => (float) $total['montant_total'],
-            'montant_satisfait' => (float) $satisfait['montant_satisfait'],
-            'montant_restant' => (float) $montant_restant
-        ]);
+        $stats = Stats::getRecapGlobal();
+        \Flight::json($stats);
     });
 
     // API pour récupérer les besoins restants (non achetés)
     $router->get('/api/besoins/remaining', function () use ($app) {
-        $DBH = \Flight::db();
-        $query = "SELECT b.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
-                  FROM Besoin b
-                  JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  JOIN Ville v ON b.id_ville = v.id_ville
-                  WHERE b.id_besoin NOT IN (SELECT id_besoin FROM Achats WHERE id_besoin IS NOT NULL)
-                  ORDER BY v.nom_ville, m.nom_matiere";
-        $stmt = $DBH->query($query);
-        $besoins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $besoins = Besoin::getBesoinsRestants();
         \Flight::json($besoins);
     });
     $router->get('/simulation', function () use ($app) {
@@ -373,46 +347,8 @@ $router->group('', function (Router $router) use ($app) {
 
     // Dispatch par date de demande (priorité aux demandes les plus anciennes)
     $router->get('/dispatch-par-date', function () use ($app) {
-        $DBH = \Flight::db();
-        
-        // Récupérer tous les besoins groupés par matière avec les villes et leurs demandes
-        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
-                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
-                  FROM Besoin b
-                  JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie
-                  JOIN Ville v ON b.id_ville = v.id_ville
-                  ORDER BY b.id_matiere, b.date_du_demande ASC";
-        
-        $besoins_par_matiere = [];
-        $stmt = $DBH->query($query);
-        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
-                $besoins_par_matiere[$row['id_matiere']] = [
-                    'nom_matiere' => $row['nom_matiere'],
-                    'nom_categorie' => $row['nom_categorie'],
-                    'id_categorie' => $row['id_categorie'],
-                    'besoins' => []
-                ];
-            }
-            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
-        }
-        
-        // Récupérer tous les dons non distribués
-        $query_dons = "SELECT d.*, m.nom_matiere, m.id_matiere
-                       FROM Dons d
-                       JOIN Matiere m ON d.id_matiere = m.id_matiere
-                       WHERE d.id_ville = 0
-                       ORDER BY d.id_matiere, d.date_don ASC";
-        
-        $dons_non_distribues = [];
-        $stmt_dons = $DBH->query($query_dons);
-        foreach ($stmt_dons->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($dons_non_distribues[$row['id_matiere']])) {
-                $dons_non_distribues[$row['id_matiere']] = [];
-            }
-            $dons_non_distribues[$row['id_matiere']][] = $row;
-        }
+        $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereByDate();
+        $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
         
         $app->render('dispatch-par-date', [
             'besoins_par_matiere' => $besoins_par_matiere,
@@ -422,46 +358,8 @@ $router->group('', function (Router $router) use ($app) {
 
     // Dispatch par minimum de demande (priorité aux besoins les plus petits)
     $router->get('/dispatch-par-min', function () use ($app) {
-        $DBH = \Flight::db();
-        
-        // Récupérer tous les besoins groupés par matière avec les villes et leurs demandes
-        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
-                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
-                  FROM Besoin b
-                  JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie
-                  JOIN Ville v ON b.id_ville = v.id_ville
-                  ORDER BY b.id_matiere, b.quantite ASC";
-        
-        $besoins_par_matiere = [];
-        $stmt = $DBH->query($query);
-        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
-                $besoins_par_matiere[$row['id_matiere']] = [
-                    'nom_matiere' => $row['nom_matiere'],
-                    'nom_categorie' => $row['nom_categorie'],
-                    'id_categorie' => $row['id_categorie'],
-                    'besoins' => []
-                ];
-            }
-            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
-        }
-        
-        // Récupérer tous les dons non distribués
-        $query_dons = "SELECT d.*, m.nom_matiere, m.id_matiere
-                       FROM Dons d
-                       JOIN Matiere m ON d.id_matiere = m.id_matiere
-                       WHERE d.id_ville = 0
-                       ORDER BY d.id_matiere, d.date_don ASC";
-        
-        $dons_non_distribues = [];
-        $stmt_dons = $DBH->query($query_dons);
-        foreach ($stmt_dons->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($dons_non_distribues[$row['id_matiere']])) {
-                $dons_non_distribues[$row['id_matiere']] = [];
-            }
-            $dons_non_distribues[$row['id_matiere']][] = $row;
-        }
+        $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereByQuantite();
+        $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
         
         $app->render('dispatch-par-min', [
             'besoins_par_matiere' => $besoins_par_matiere,
@@ -471,47 +369,8 @@ $router->group('', function (Router $router) use ($app) {
 
     // Dispatch proportionnel (ratio besoin/nombre de dons, arrondi à la valeur basse)
     $router->get('/dispatch-proportionnel', function () use ($app) {
-        $DBH = \Flight::db();
-        
-        // Récupérer tous les besoins groupés par matière avec les villes et leurs demandes
-        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
-                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
-                  FROM Besoin b
-                  JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  JOIN Categorie c ON m.id_categorie = c.id_categorie
-                  JOIN Ville v ON b.id_ville = v.id_ville
-                  WHERE b.quantite > 0
-                  ORDER BY b.id_matiere, b.id_besoin ASC";
-        
-        $besoins_par_matiere = [];
-        $stmt = $DBH->query($query);
-        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
-                $besoins_par_matiere[$row['id_matiere']] = [
-                    'nom_matiere' => $row['nom_matiere'],
-                    'nom_categorie' => $row['nom_categorie'],
-                    'id_categorie' => $row['id_categorie'],
-                    'besoins' => []
-                ];
-            }
-            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
-        }
-        
-        // Récupérer tous les dons non distribués
-        $query_dons = "SELECT d.*, m.nom_matiere, m.id_matiere
-                       FROM Dons d
-                       JOIN Matiere m ON d.id_matiere = m.id_matiere
-                       WHERE d.id_ville = 0
-                       ORDER BY d.id_matiere, d.date_don ASC";
-        
-        $dons_non_distribues = [];
-        $stmt_dons = $DBH->query($query_dons);
-        foreach ($stmt_dons->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            if (!isset($dons_non_distribues[$row['id_matiere']])) {
-                $dons_non_distribues[$row['id_matiere']] = [];
-            }
-            $dons_non_distribues[$row['id_matiere']][] = $row;
-        }
+        $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereProportionnel();
+        $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
         
         $app->render('dispatch-proportionnel', [
             'besoins_par_matiere' => $besoins_par_matiere,
@@ -532,98 +391,27 @@ $router->group('', function (Router $router) use ($app) {
         // Décoder les données de repartition
         $repartition = json_decode($repartition_json, true);
         
-        if (empty($repartition)) {
-            \Flight::redirect('/dispatch-par-date');
-            return;
-        }
+        $result = DispatchController::validerDispatch($repartition);
         
-        $DBH = \Flight::db();
-        $DBH->beginTransaction();
-        
-        try {
-            // Pour chaque attribution, mettre à jour les dons
-            foreach ($repartition as $attribution) {
-                $id_ville = $attribution['id_ville'];
-                $quantite_a_dispatcher = $attribution['quantite'];
-                $id_besoin = $attribution['id_besoin'];
-                
-                // Récupérer le id_matiere du besoin
-                $query = "SELECT id_matiere FROM Besoin WHERE id_besoin = :id_besoin";
-                $stmt = $DBH->prepare($query);
-                $stmt->bindValue(':id_besoin', $id_besoin, \PDO::PARAM_INT);
-                $stmt->execute();
-                $besoin = $stmt->fetch(\PDO::FETCH_ASSOC);
-                
-                if (!$besoin) continue;
-                
-                $id_matiere = $besoin['id_matiere'];
-                
-                // Récupérer les dons non distribués de cette matière (par ordre)
-                $query_dons = "SELECT id_don, quantite FROM Dons 
-                              WHERE id_matiere = :id_matiere AND id_ville = 0
-                              ORDER BY date_don ASC";
-                $stmt_dons = $DBH->prepare($query_dons);
-                $stmt_dons->bindValue(':id_matiere', $id_matiere, \PDO::PARAM_INT);
-                $stmt_dons->execute();
-                $dons = $stmt_dons->fetchAll(\PDO::FETCH_ASSOC);
-                
-                // Dispatcher les dons
-                $quantite_restante = $quantite_a_dispatcher;
-                foreach ($dons as $don) {
-                    if ($quantite_restante <= 0) break;
-                    
-                    $quantite_a_prendre = min($don['quantite'], $quantite_restante);
-                    
-                    // Mettre à jour le don
-                    $update_query = "UPDATE Dons SET id_ville = :id_ville, quantite = quantite - :quantite_a_prendre 
-                                   WHERE id_don = :id_don";
-                    $update_stmt = $DBH->prepare($update_query);
-                    $update_stmt->bindValue(':id_ville', $id_ville, \PDO::PARAM_INT);
-                    $update_stmt->bindValue(':quantite_a_prendre', $quantite_a_prendre, \PDO::PARAM_INT);
-                    $update_stmt->bindValue(':id_don', $don['id_don'], \PDO::PARAM_INT);
-                    $update_stmt->execute();
-                    
-                    $quantite_restante -= $quantite_a_prendre;
-                }
-            }
-            
-            $DBH->commit();
-            error_log('[SUCCESS] Dispatch validé avec succès');
-            \Flight::redirect('/dashboard?success=Dispatch validé avec succès');
-        } catch (Exception $e) {
-            $DBH->rollBack();
-            error_log('[ERROR] Erreur lors du dispatch: ' . $e->getMessage());
-            \Flight::redirect('/dispatch-par-date?error=' . urlencode($e->getMessage()));
+        if ($result['success']) {
+            error_log('[SUCCESS] ' . $result['message']);
+            \Flight::redirect('/dashboard?success=' . urlencode($result['message']));
+        } else {
+            error_log('[ERROR] ' . $result['message']);
+            \Flight::redirect('/dispatch-par-date?error=' . urlencode($result['message']));
         }
     });
 
     // Route pour réinitialiser toutes les données
     $router->post('/api/reinitialiser', function () use ($app) {
-        $DBH = \Flight::db();
-        $DBH->beginTransaction();
+        $result = DispatchController::reinitialiser();
         
-        try {
-            // Supprimer tous les achats
-            $query_delete_achats = "DELETE FROM Achats";
-            $DBH->exec($query_delete_achats);
-            error_log('[INFO] Tous les achats supprimés');
-            
-            // Réinitialiser tous les dons (id_ville = 0)
-            $query_reset_dons = "UPDATE Dons SET id_ville = 0";
-            $DBH->exec($query_reset_dons);
-            error_log('[INFO] Tous les dons réinitialisés (id_ville = 0)');
-            
-            // Les besoins restent avec leur quantité initiale (pas de suppression)
-            // Les besoins sont déjà créés avec leur quantité originale
-            error_log('[INFO] Besoins conservés avec leur quantité initiale');
-            
-            $DBH->commit();
-            error_log('[SUCCESS] Réinitialisation complète réussie');
-            \Flight::redirect('/?success=Réinitialisation complète réussie. Tous les dons sont maintenant non distribués, les besoins sont réinitialisés à leurs valeurs initiales, et tous les achats ont été supprimés.');
-        } catch (Exception $e) {
-            $DBH->rollBack();
-            error_log('[ERROR] Erreur lors de la réinitialisation: ' . $e->getMessage());
-            \Flight::redirect('/?error=' . urlencode('Erreur lors de la réinitialisation: ' . $e->getMessage()));
+        if ($result['success']) {
+            error_log('[SUCCESS] ' . $result['message']);
+            \Flight::redirect('/?success=' . urlencode($result['message']));
+        } else {
+            error_log('[ERROR] ' . $result['message']);
+            \Flight::redirect('/?error=' . urlencode($result['message']));
         }
     });
 }, [SecurityHeadersMiddleware::class]);
