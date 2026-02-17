@@ -23,7 +23,7 @@ create table Matiere(
     prix_unitaire float,
     id_categorie INT
 );
-ALTER TABLE Matiere ADD id_categorie INT
+
 create table Besoin(
     id_besoin int primary key auto_increment,
     id_matiere int,
@@ -31,8 +31,6 @@ create table Besoin(
     id_ville int,
     date_du_demande datetime default current_timestamp
 );
-
-ALTER TABLE Besoin ADD date_du_demande datetime default current_timestamp;
 create table Achats(
     id_achat int primary key auto_increment,
     id_besoin int,
@@ -72,19 +70,6 @@ VALUES(7, 'Cuisine');
 INSERT INTO Categorie
 (id_categorie, nom)
 VALUES(8, 'Bijoux');
--- 3. Insertion des matières
-INSERT INTO Matiere (nom_matiere, prix_unitaire, id_categorie) VALUES
--- EN NATURE (id_categorie = 1)
-('Riz', 2500, 1),
-('Huile', 5000, 1),
-('Sucre', 1800, 1),
-('Farine', 1200, 1),
-('Lait', 3000, 1),
-('Pâtes', 1500, 1),
-('Sel', 500, 1),
-('Eau minérale', 1000, 1),
-('Biscuits', 500, 1),
-('Conserves', 2000, 1),
 
 -- 1. Insertion des régions
 INSERT INTO Region (nom_region) VALUES
