@@ -240,5 +240,69 @@ class Dons
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int) ($result['quantite_total'] ?? 0);
     }
+
+    /**
+     * Récupérer les dons non distribués groupés par matière
+     */
+    public static function getDonsNonDistribuesGroupedByMatiere()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT d.*, m.nom_matiere, m.id_matiere
+                       FROM Dons d
+                       JOIN Matiere m ON d.id_matiere = m.id_matiere
+                       WHERE d.id_ville = 0
+                       ORDER BY d.id_matiere, d.date_don ASC";
+        
+        $dons_non_distribues = [];
+        $stmt = $DBH->query($query);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($dons_non_distribues[$row['id_matiere']])) {
+                $dons_non_distribues[$row['id_matiere']] = [];
+            }
+            $dons_non_distribues[$row['id_matiere']][] = $row;
+        }
+        
+        return $dons_non_distribues;
+    }
+
+    /**
+     * Récupérer les dons non distribués pour une matière (pour dispatch)
+     */
+    public static function getDonsNonDistribuesPourDispatch($id_matiere)
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT id_don, quantite FROM Dons 
+                  WHERE id_matiere = :id_matiere AND id_ville = 0
+                  ORDER BY date_don ASC";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_matiere', $id_matiere, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Dispatcher un don vers une ville (mise à jour partielle)
+     */
+    public static function dispatcherDon($id_don, $id_ville, $quantite_a_prendre)
+    {
+        $DBH = \Flight::db();
+        $query = "UPDATE Dons SET id_ville = :id_ville, quantite = quantite - :quantite_a_prendre 
+                  WHERE id_don = :id_don";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_ville', $id_ville, PDO::PARAM_INT);
+        $stmt->bindValue(':quantite_a_prendre', $quantite_a_prendre, PDO::PARAM_INT);
+        $stmt->bindValue(':id_don', $id_don, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    /**
+     * Réinitialiser tous les dons (id_ville = 0)
+     */
+    public static function reinitialiserTous()
+    {
+        $DBH = \Flight::db();
+        $query = "UPDATE Dons SET id_ville = 0";
+        return $DBH->exec($query);
+    }
 }
 

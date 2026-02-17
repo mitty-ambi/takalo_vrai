@@ -184,4 +184,14 @@ class Achat
     {
         return $prix_base * (1 + ($frais_pourcentage / 100));
     }
+
+    /**
+     * Supprimer tous les achats (pour réinitialisation)
+     */
+    public static function deleteAll()
+    {
+        $DBH = \Flight::db();
+        $query = "DELETE FROM Achats";
+        return $DBH->exec($query);
+    }
 }

@@ -86,4 +86,130 @@ class Besoin
         }
         return $data;
     }
+
+    /**
+     * Récupérer les besoins groupés par matière (pour dispatch par date)
+     * Ordonnés par date de demande ASC
+     */
+    public static function getBesoinsGroupedByMatiereByDate()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
+                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
+                  FROM Besoin b
+                  JOIN Matiere m ON b.id_matiere = m.id_matiere
+                  LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie
+                  JOIN Ville v ON b.id_ville = v.id_ville
+                  ORDER BY b.id_matiere, b.date_du_demande ASC";
+        
+        $besoins_par_matiere = [];
+        $stmt = $DBH->query($query);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
+                $besoins_par_matiere[$row['id_matiere']] = [
+                    'nom_matiere' => $row['nom_matiere'],
+                    'nom_categorie' => $row['nom_categorie'],
+                    'id_categorie' => $row['id_categorie'],
+                    'besoins' => []
+                ];
+            }
+            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
+        }
+        
+        return $besoins_par_matiere;
+    }
+
+    /**
+     * Récupérer les besoins groupés par matière (pour dispatch par minimum)
+     * Ordonnés par quantité ASC
+     */
+    public static function getBesoinsGroupedByMatiereByQuantite()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
+                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
+                  FROM Besoin b
+                  JOIN Matiere m ON b.id_matiere = m.id_matiere
+                  LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie
+                  JOIN Ville v ON b.id_ville = v.id_ville
+                  ORDER BY b.id_matiere, b.quantite ASC";
+        
+        $besoins_par_matiere = [];
+        $stmt = $DBH->query($query);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
+                $besoins_par_matiere[$row['id_matiere']] = [
+                    'nom_matiere' => $row['nom_matiere'],
+                    'nom_categorie' => $row['nom_categorie'],
+                    'id_categorie' => $row['id_categorie'],
+                    'besoins' => []
+                ];
+            }
+            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
+        }
+        
+        return $besoins_par_matiere;
+    }
+
+    /**
+     * Récupérer les besoins groupés par matière pour dispatch proportionnel
+     * Filtre les besoins avec quantité > 0
+     */
+    public static function getBesoinsGroupedByMatiereProportionnel()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT b.id_matiere, m.nom_matiere, m.id_categorie, c.nom as nom_categorie,
+                         b.id_ville, v.nom_ville, b.quantite, b.date_du_demande, b.id_besoin
+                  FROM Besoin b
+                  JOIN Matiere m ON b.id_matiere = m.id_matiere
+                  JOIN Categorie c ON m.id_categorie = c.id_categorie
+                  JOIN Ville v ON b.id_ville = v.id_ville
+                  WHERE b.quantite > 0
+                  ORDER BY b.id_matiere, b.id_besoin ASC";
+        
+        $besoins_par_matiere = [];
+        $stmt = $DBH->query($query);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($besoins_par_matiere[$row['id_matiere']])) {
+                $besoins_par_matiere[$row['id_matiere']] = [
+                    'nom_matiere' => $row['nom_matiere'],
+                    'nom_categorie' => $row['nom_categorie'],
+                    'id_categorie' => $row['id_categorie'],
+                    'besoins' => []
+                ];
+            }
+            $besoins_par_matiere[$row['id_matiere']]['besoins'][] = $row;
+        }
+        
+        return $besoins_par_matiere;
+    }
+
+    /**
+     * Récupérer les besoins restants (non achetés)
+     */
+    public static function getBesoinsRestants()
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT b.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
+                  FROM Besoin b
+                  JOIN Matiere m ON b.id_matiere = m.id_matiere
+                  JOIN Ville v ON b.id_ville = v.id_ville
+                  WHERE b.id_besoin NOT IN (SELECT id_besoin FROM Achats WHERE id_besoin IS NOT NULL)
+                  ORDER BY v.nom_ville, m.nom_matiere";
+        $stmt = $DBH->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Récupérer le besoin par id_besoin (id_matiere)
+     */
+    public static function getMatiereByBesoin($id_besoin)
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT id_matiere FROM Besoin WHERE id_besoin = :id_besoin";
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_besoin', $id_besoin, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

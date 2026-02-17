@@ -206,3 +206,4 @@ GROUP BY v.id_ville;
 
 -- Tester la vue
 SELECT * FROM vue_dashboard_ville;
+ALTER table Besoin ADD column date_du_demande datetime default current_timestamp;
