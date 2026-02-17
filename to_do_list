@@ -1,46 +1,57 @@
 TODO LISTE PROJET
 Système de gestion des dons et des besoins
 
-TÂCHES TERMINÉES (OK)
+=====================================================================
 
-Architecture et base de données
+ARCHITECTURE ET BASE DE DONNÉES
     OK - Architecture générale (MVC, template, organisation des dossiers) - ambinintsoa
     OK - Création des tables (région, ville, don, besoin…) et relations - alan
+    OK - Modification table besoin (ajout colonne date demande) - alan
 
-Authentification
+AUTHENTIFICATION
     OK - Système de connexion utilisateur
     OK - Vérification des identifiants et protection des routes
 
-Gestion des besoins
+GESTION DES BESOINS
     OK - Page insertion besoin avec formulaire fonctionnel - dave
     OK - Fonction insertion besoin (model, controller) avec enregistrement en base - dave
     OK - Routage besoin correctement configuré - dave
 
-Gestion des dons
+GESTION DES DONS
     OK - Page insertion don avec formulaire - alan
     OK - Fonction insertion don (model, controller) et validation des données - alan
     OK - Routage don opérationnel - alan
 
-Dashboard et interface
+DASHBOARD ET INTERFACE
     OK - Dashboard avec affichage des statistiques principales - dave
     OK - Design des pages et harmonisation visuelle - ambinintsoa
     OK - Footer intégré au layout principal - ambinintsoa
     OK - Dispatch pour centralisation de l’affichage - alan
+    OK - Distribution des données vers les vues - dave
 
-Gestion des villes
+GESTION DES VILLES
     OK - Fonction liste des villes depuis la base - ambinintsoa
     OK - Routage villes et affichage associé - ambinintsoa
 
-Filtres et affichages
+FILTRES ET AFFICHAGES
     OK - Filtre par ville avec affichage dynamique des besoins - ambinintsoa
     OK - Fonction liste des dons par ville (requête filtrée) - alan
     OK - Liste des dons par ville avec affichage structuré - alan
 
-Besoins restants
+BESOINS RESTANTS
     OK - Fonction calcul des besoins restants après dons - ambinintsoa
     OK - Liste des besoins restants mise à jour correctement - ambinintsoa
 
-Simulation et dynamique
+SIMULATION ET DISPATCH AVANCÉ
     OK - Simulation de répartition des dons avec logique de calcul - alan
+    OK - Méthodes backend pour les dispatch - dave
+    OK - Page Dispatch par date de demande - alan
+    OK - Page Dispatch par minimum de demande - alan
+    OK - Page Dispatch par proportionnalité - alan
+    OK - Boutons de navigation (date, min, proportionnel) dans le navbar - ambinintsoa
+
+DYNAMIQUE ET AJAX
     OK - Rafraîchissement des montants en Ajax sans rechargement - dave
     OK - Fonction calcul achat intégrée aux prix unitaires - ambinintsoa
+    OK - Ajout bouton réinitialisation - alan
+    OK - Fonction réinitialiser données (Backend + Ajax) - alan
