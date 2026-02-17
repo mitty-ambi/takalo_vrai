@@ -1,4 +1,4 @@
-<?php $base_url = rtrim(Flight::get('flight.base_url'), '/'); 
+<?php $base_url = rtrim(Flight::get('flight.base_url'), '/');
 $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
 ?>
 <!DOCTYPE html>
@@ -23,37 +23,45 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         </div>
 
         <!-- Liste des dons non distribués -->
-        <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
-            <h2 style="color: #333; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
+        <div
+            style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+            <h2
+                style="color: #333; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
                 📦 Dons en Attente de Distribution
             </h2>
-            
-            <div id="donsContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+
+            <div id="donsContent"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
                 <p style="text-align: center; color: #999;">Chargement...</p>
             </div>
         </div>
 
         <!-- Simulation de répartition -->
         <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <h2 style="color: #333; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+            <h2
+                style="color: #333; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
                 ✓ Actions de Dispatch
             </h2>
-            
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <button type="button" id="btnSimulerTout" class="btn" style="padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500; transition: all 0.3s;">
+                <button type="button" id="btnSimulerTout" class="btn"
+                    style="padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500; transition: all 0.3s;">
                     👁️ Simuler Distribution
                 </button>
-                <button type="button" id="btnValiderTout" class="btn" style="padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500; transition: all 0.3s;">
+                <button type="button" id="btnValiderTout" class="btn"
+                    style="padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500; transition: all 0.3s;">
                     ✓ Valider & Dispatcher
                 </button>
-                <a href="<?= $base_url ?>/dispatch" class="btn" style="padding: 15px; background-color: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; text-align: center; font-size: 16px; font-weight: 500; transition: all 0.3s;">
+                <a href="<?= $base_url ?>/dispatch" class="btn"
+                    style="padding: 15px; background-color: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; text-align: center; font-size: 16px; font-weight: 500; transition: all 0.3s;">
                     📍 Aller à Dispatch
                 </a>
             </div>
         </div>
 
         <!-- Résultats de simulation -->
-        <div id="resultSimulation" style="margin-top: 30px; display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div id="resultSimulation"
+            style="margin-top: 30px; display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
             <h2 style="color: #333; margin-top: 0; margin-bottom: 20px;">
                 📊 Résumé de la Simulation
             </h2>
@@ -74,7 +82,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('donsContent');
-                    
+
                     if (!Array.isArray(data) || data.length === 0) {
                         container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #999;"><i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 10px;"></i><p>✅ Tous les dons ont déjà été distribués!</p></div>';
                         document.getElementById('btnSimulerTout').disabled = true;
@@ -139,7 +147,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         }
 
         // Bouton Simuler
-        document.getElementById('btnSimulerTout').addEventListener('click', function() {
+        document.getElementById('btnSimulerTout').addEventListener('click', function () {
             this.disabled = true;
             this.innerHTML = '⏳ Simulation en cours...';
 
@@ -151,11 +159,11 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
 
                     if (data.success || data.length > 0) {
                         let html = '<div style="background-color: #d4edda; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #28a745;"><strong>✓ Simulation valide</strong> - Prêt à dispatcher</div>';
-                        
+
                         if (Array.isArray(data)) {
                             html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
                             html += '<thead style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;"><tr><th style="padding: 12px; text-align: left; font-weight: 600;">Ville</th><th style="padding: 12px; text-align: left; font-weight: 600;">Matière</th><th style="padding: 12px; text-align: right; font-weight: 600;">Quantité</th><th style="padding: 12px; text-align: right; font-weight: 600;">Valeur</th></tr></thead><tbody>';
-                            
+
                             data.forEach(item => {
                                 const valeur = item.quantite * item.prix_unitaire;
                                 html += `<tr style="border-bottom: 1px solid #dee2e6;"><td style="padding: 12px;">${item.nom_ville || 'À assigner'}</td><td style="padding: 12px;">${item.nom_matiere}</td><td style="padding: 12px; text-align: right;">${item.quantite}</td><td style="padding: 12px; text-align: right; font-weight: 500;">${formatMontant(valeur)}</td></tr>`;
@@ -184,7 +192,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         });
 
         // Bouton Valider
-        document.getElementById('btnValiderTout').addEventListener('click', function() {
+        document.getElementById('btnValiderTout').addEventListener('click', function () {
             if (!confirm('Êtes-vous sûr de vouloir dispatcher tous les dons non distribués?\n\nCette action est irréversible.')) {
                 return;
             }
@@ -200,7 +208,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
                     if (data.success) {
                         const resultDiv = document.getElementById('resultSimulation');
                         const resultContent = document.getElementById('resultContent');
-                        
+
                         resultContent.innerHTML = `
                             <div style="background-color: #d4edda; padding: 20px; border-radius: 6px; border-left: 4px solid #28a745; text-align: center;">
                                 <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
@@ -236,6 +244,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         // Rafraîchir tous les 10 secondes
         setInterval(chargerDons, 10000);
     </script>
+    <?php include("footer.php"); ?>
 </body>
 
 </html>

@@ -93,11 +93,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bngrc-footer">
-        <!-- ... footer content ... -->
-    </footer>
+    <?php include("footer.php") ?>
 </body>
 
 </html>

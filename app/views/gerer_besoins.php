@@ -329,6 +329,7 @@
         // Rafraîchir les besoins toutes les 10 secondes
         setInterval(loadBesoins, 10000);
     </script>
+    <?php include("footer.php") ?>
 </body>
 
 </html>
