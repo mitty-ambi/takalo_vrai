@@ -34,7 +34,6 @@ class DispatchController
 
                 error_log('[DEBUG] Traitement attribution: besoin=' . $id_besoin . ', ville=' . $id_ville . ', quantite=' . $quantite_a_dispatcher);
 
-                // Récupérer le id_matiere du besoin
                 $besoin = Besoin::getMatiereByBesoin($id_besoin);
 
                 if (!$besoin) {
@@ -86,25 +85,25 @@ class DispatchController
     public static function dispatcherSimple()
     {
         $dons_non_distribues = Dons::getDonsNonDistribuee();
-        
+
         if (empty($dons_non_distribues)) {
             return ['success' => false, 'message' => 'Aucun don à dispatcher'];
         }
-        
+
         $DBH = \Flight::db();
         $DBH->beginTransaction();
-        
+
         try {
             $updated = 0;
-            
+
             // Récupérer tous les besoins
             $besoins = Besoin::getAll();
-            
+
             // Pour chaque besoin, chercher un don correspondant
             foreach ($besoins as $besoin) {
                 $id_ville = $besoin['id_ville'];
                 $id_matiere = $besoin['id_matiere'];
-                
+
                 // Chercher un don correspondant à cette matière et non encore distribué
                 foreach ($dons_non_distribues as $don) {
                     if ($don['id_matiere'] == $id_matiere && $don['id_ville'] == 0) {
@@ -113,7 +112,7 @@ class DispatchController
                         $stmt = $DBH->prepare($query);
                         $stmt->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
                         $stmt->bindValue(':id_don', (int) $don['id_don'], \PDO::PARAM_INT);
-                        
+
                         if ($stmt->execute()) {
                             $updated++;
                         }
@@ -121,7 +120,7 @@ class DispatchController
                     }
                 }
             }
-            
+
             $DBH->commit();
             return ['success' => true, 'message' => $updated . ' dons dispatchés'];
         } catch (\Exception $e) {
