@@ -10,22 +10,25 @@ class Besoin
     public $id_matiere;
     public $id_ville;
     public $quantite;
+    public $date_du_demande;
 
-    public function __construct($id_besoin, $id_matiere, $id_ville, $quantite)
+    public function __construct($id_besoin, $id_matiere, $id_ville, $quantite, $date_du_demande = null)
     {
         $this->id_besoin = $id_besoin;
         $this->id_matiere = $id_matiere;
         $this->id_ville = $id_ville;
         $this->quantite = $quantite;
+        $this->date_du_demande = $date_du_demande;
     }
     public function insert_base()
     {
         $DBH = \Flight::db();
-        $query = "INSERT INTO Besoin (id_matiere, id_ville, quantite) VALUES (:id_matiere, :id_ville, :quantite)";
+        $query = "INSERT INTO Besoin (id_matiere, id_ville, quantite, date_du_demande) VALUES (:id_matiere, :id_ville, :quantite, :date_du_demande)";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':id_matiere', (int) $this->id_matiere, PDO::PARAM_INT);
         $stmt->bindValue(':id_ville', (int) $this->id_ville, PDO::PARAM_INT);
         $stmt->bindValue(':quantite', $this->quantite);
+        $stmt->bindValue(':date_du_demande', $this->date_du_demande);
 
         if ($stmt->execute()) {
             return true;

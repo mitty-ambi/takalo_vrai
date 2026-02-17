@@ -28,7 +28,8 @@ create table Besoin(
     id_besoin int primary key auto_increment,
     id_matiere int,
     quantite int,
-    id_ville int
+    id_ville int,
+    date_du_demande datetime default current_timestamp
 );
 
 create table Achats(

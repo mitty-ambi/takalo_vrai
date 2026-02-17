@@ -200,7 +200,8 @@
                                 <option value="">-- Sélectionner une matière --</option>
                                 <?php foreach ($matieres as $matiere): ?>
                                     <option value="<?= htmlspecialchars($matiere['id_matiere']) ?>"
-                                        data-prix="<?= htmlspecialchars($matiere['prix_unitaire']) ?>">
+                                        data-prix="<?= htmlspecialchars($matiere['prix_unitaire']) ?>"
+                                        data-categorie="<?= htmlspecialchars($matiere['id_categorie']) ?>">
                                         <?= htmlspecialchars($matiere['nom_matiere']) ?>
                                         (<?= number_format($matiere['prix_unitaire'], 0, '.', ' ') ?> Ar)
                                     </option>
@@ -213,6 +214,11 @@
                             <label for="quantite">Quantité:</label>
                             <input type="number" name="quantite" id="quantite" required min="1"
                                 placeholder="Entrez la quantité" onchange="updateTotal()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date_du_demande">Date de demande:</label>
+                            <input type="datetime-local" name="date_du_demande" id="date_du_demande" required>
                         </div>
 
                         <div class="form-group" style="background-color: #e7f3ff; padding: 10px; border-radius: 4px;">
@@ -240,6 +246,27 @@
         const base_url = '<?= $base_url ?>';
         const matieres = <?= json_encode($matieres) ?>;
 
+        // Filtrer les matières par catégorie
+        document.getElementById('id_categorie').addEventListener('change', function() {
+            const selectedCategorie = this.value;
+            const matiere_select = document.getElementById('id_matiere');
+            
+            // Réinitialiser la sélection de matière
+            matiere_select.value = '';
+            
+            // Afficher/masquer les matières selon la catégorie
+            Array.from(matiere_select.options).forEach(option => {
+                if (option.value === '') {
+                    option.style.display = '';
+                } else {
+                    const optionCategorie = option.getAttribute('data-categorie');
+                    option.style.display = optionCategorie === selectedCategorie ? '' : 'none';
+                }
+            });
+            
+            updateTotal();
+        });
+
         function updateMatierePrix() {
             updateTotal();
         }
@@ -266,6 +293,7 @@
                         let html = '';
                         data.forEach(besoin => {
                             const prix_total = besoin.prix_unitaire * besoin.quantite;
+                            const date_demande = besoin.date_du_demande ? new Date(besoin.date_du_demande).toLocaleString('fr-FR') : 'N/A';
 
                             html += `
                                 <div class="besoin-item">
@@ -280,6 +308,9 @@
                                     </div>
                                     <div class="besoin-info">
                                         <strong>Quantité:</strong> <span>${besoin.quantite}</span>
+                                    </div>
+                                    <div class="besoin-info">
+                                        <strong>Date de demande:</strong> <span>${date_demande}</span>
                                     </div>
                                     <div class="besoin-info">
                                         <strong>Prix Unitaire:</strong> <span>${new Intl.NumberFormat('fr-FR').format(besoin.prix_unitaire)} Ar</span>
@@ -324,7 +355,18 @@
         }
 
         // Charger les besoins au démarrage
-        document.addEventListener('DOMContentLoaded', loadBesoins);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBesoins();
+            
+            // Définir la date/heure actuelle par défaut
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('date_du_demande').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        });
 
         // Rafraîchir les besoins toutes les 10 secondes
         setInterval(loadBesoins, 10000);

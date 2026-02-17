@@ -14,14 +14,16 @@ class BesoinController
             $id_ville = $_POST['id_ville'] ?? null;
             $id_categorie = $_POST['id_categorie'] ?? null;
             $quantite = $_POST['quantite'] ?? null;
-            if (!$id_matiere || !$id_ville || !$quantite) {
+            $date_du_demande = $_POST['date_du_demande'] ?? null;
+            
+            if (!$id_matiere || !$id_ville || !$quantite || !$date_du_demande) {
                 return [
                     'success' => false,
                     'message' => 'Tous les champs sont obligatoires'
                 ];
             }
 
-            $besoin = new Besoin(null, $id_matiere, $id_ville, $quantite);
+            $besoin = new Besoin(null, $id_matiere, $id_ville, $quantite, $date_du_demande);
 
             if ($besoin->insert_base()) {
                 return [
