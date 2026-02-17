@@ -25,11 +25,13 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
             font-weight: 500;
             transition: all 0.3s ease;
         }
+
         .btn-reset:hover {
             background: #c82333 !important;
             transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
+
         .btn-reset:active {
             transform: scale(0.98);
         }
@@ -140,7 +142,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         document.getElementById('btnRefresh').addEventListener('click', chargerStats);
 
         // Event listener pour le bouton réinitialiser
-        document.getElementById('btnReinitialiser').addEventListener('click', function() {
+        document.getElementById('btnReinitialiser').addEventListener('click', function () {
             if (confirm('⚠️ ATTENTION! Cette action va:\n\n✓ Supprimer TOUS les achats\n✓ Réinitialiser TOUS les dons comme non distribués\n✓ Conserver les besoins avec leur quantité initiale\n\nCette action est IRRÉVERSIBLE!\n\nÊtes-vous sûr(e)?')) {
                 if (confirm('Êtes-vous TRÈS sûr(e)? Cette action ne peut pas être annulée!')) {
                     // Créer un formulaire et soumettre

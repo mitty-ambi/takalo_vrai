@@ -1,6 +1,7 @@
 <?php $base_url = rtrim(Flight::get('flight.base_url'), '/'); ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,33 +14,39 @@
             background: #f5f5f5;
             margin: 0;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .header {
             background: white;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .header h1 {
             margin: 0;
             color: #003366;
         }
+
         .header p {
             margin: 5px 0 0 0;
             color: #666;
         }
+
         .matiere-section {
             background: white;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .matiere-title {
             background: #f0f0f0;
             padding: 15px;
@@ -47,10 +54,12 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
+
         .matiere-title h2 {
             margin: 0;
             color: #003366;
         }
+
         .matiere-title .badge {
             display: inline-block;
             background: #FF6600;
@@ -60,9 +69,11 @@
             font-size: 12px;
             margin-left: 10px;
         }
+
         .dons-list {
             margin-bottom: 20px;
         }
+
         .don-item {
             background: #f9f9f9;
             padding: 15px;
@@ -70,38 +81,46 @@
             border-left: 4px solid #007bff;
             border-radius: 4px;
         }
+
         .don-item strong {
             color: #003366;
         }
+
         .besoins-distribution {
             background: #f0f0f0;
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
         }
+
         .repartition-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         .repartition-table th {
             background: #003366;
             color: white;
             padding: 12px;
             text-align: left;
         }
+
         .repartition-table td {
             padding: 12px;
             border-bottom: 1px solid #ddd;
         }
+
         .repartition-table tr:hover {
             background: #f5f5f5;
         }
+
         .btn-group {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
+
         .btn {
             padding: 12px 20px;
             border: none;
@@ -111,22 +130,27 @@
             font-weight: bold;
             transition: all 0.3s;
         }
+
         .btn-valider {
             background: #28a745;
             color: white;
             flex: 1;
         }
+
         .btn-valider:hover {
             background: #218838;
         }
+
         .btn-retour {
             background: #ccc;
             color: #333;
             flex: 1;
         }
+
         .btn-retour:hover {
             background: #bbb;
         }
+
         .info-box {
             background: #e3f2fd;
             border-left: 4px solid #2196F3;
@@ -134,9 +158,11 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
+
         .info-box strong {
             color: #1976D2;
         }
+
         .attribution {
             background: #e8f5e9;
             padding: 5px 10px;
@@ -146,9 +172,10 @@
         }
     </style>
 </head>
+
 <body>
     <?php include("navbar.php"); ?>
-    
+
     <div class="container">
         <div class="header">
             <h1>📊 Dispatch par Minimum de Demande</h1>
@@ -156,13 +183,12 @@
         </div>
 
         <div class="info-box">
-            <strong>ℹ️ Méthode:</strong> Les dons sont distribués aux villes ayant les besoins les plus petits en premier. 
+            <strong>ℹ️ Méthode:</strong> Les dons sont distribués aux villes ayant les besoins les plus petits en
+            premier.
             Les besoins plus importants reçoivent ce qui reste après satisfaction des besoins plus petits.
         </div>
 
-        <form id="dispatchForm" method="POST" action="<?= $base_url ?>/api/dispatch/valider">
-            <input type="hidden" name="type_dispatch" value="par_min">
-            <input type="hidden" id="repartitionData" name="repartition" value="{}">
+        <form method="POST" action="<?= $base_url ?>/api/dispatch/valider">
 
             <?php foreach ($besoins_par_matiere as $id_matiere => $matiere_data): ?>
                 <?php if (!isset($dons_non_distribues[$id_matiere]) || empty($dons_non_distribues[$id_matiere])): ?>
@@ -181,8 +207,8 @@
                         <?php $total_dons = 0; ?>
                         <?php foreach ($dons_non_distribues[$id_matiere] as $don): ?>
                             <div class="don-item">
-                                <strong>Don #<?= $don['id_don'] ?></strong> - 
-                                <strong><?= $don['quantite'] ?> unités</strong> 
+                                <strong>Don #<?= $don['id_don'] ?></strong> -
+                                <strong><?= $don['quantite'] ?> unités</strong>
                                 (<?= date('d/m/Y', strtotime($don['date_don'])) ?>)
                             </div>
                             <?php $total_dons += $don['quantite']; ?>
@@ -205,13 +231,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php 
+                                <?php
                                 $quantite_distribuee = 0;
-                                foreach ($matiere_data['besoins'] as $besoin): 
+                                foreach ($matiere_data['besoins'] as $besoin):
                                     $quantite_a_attribuer = min($besoin['quantite'], $total_dons - $quantite_distribuee);
                                     $quantite_distribuee += $quantite_a_attribuer;
-                                ?>
-                                    <tr data-id-besoin="<?= $besoin['id_besoin'] ?>" data-quantite="<?= $quantite_a_attribuer ?>" data-id-ville="<?= $besoin['id_ville'] ?>">
+                                    ?>
+                                    <tr data-id-besoin="<?= $besoin['id_besoin'] ?>"
+                                        data-quantite="<?= $quantite_a_attribuer ?>" data-id-ville="<?= $besoin['id_ville'] ?>">
                                         <td><strong><?= htmlspecialchars($besoin['nom_ville']) ?></strong></td>
                                         <td><?= $besoin['quantite'] ?> unités</td>
                                         <td><?= date('d/m/Y H:i', strtotime($besoin['date_du_demande'])) ?></td>
@@ -240,27 +267,8 @@
     </div>
 
     <script>
-        document.getElementById('dispatchForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            // Collecter les données de repartition
-            const repartitionData = [];
-            document.querySelectorAll('tbody tr[data-id-besoin]').forEach(row => {
-                const quantite = parseInt(row.getAttribute('data-quantite'));
-                if (quantite > 0) {
-                    repartitionData.push({
-                        id_besoin: parseInt(row.getAttribute('data-id-besoin')),
-                        id_ville: parseInt(row.getAttribute('data-id-ville')),
-                        quantite: quantite
-                    });
-                }
-            });
-
-            document.getElementById('repartitionData').value = JSON.stringify(repartitionData);
-            
-            // Soumettre le formulaire
-            this.submit();
-        });
+        // Pas de JavaScript complexe - simple POST
     </script>
 </body>
+
 </html>

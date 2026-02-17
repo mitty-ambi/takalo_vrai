@@ -265,7 +265,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/api/achats/check-undistributed/@id_matiere/@id_ville', function ($id_matiere, $id_ville) use ($app) {
         $dons_non_distribues = \app\models\Dons::getDonsNonDistribuesByMatiere($id_matiere);
         $quantite_disponible = \app\models\Dons::getQuantiteTotalNonDistribuee($id_matiere);
-        
+
         if ($quantite_disponible > 0) {
             \Flight::json([
                 'success' => false,
@@ -349,7 +349,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/dispatch-par-date', function () use ($app) {
         $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereByDate();
         $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
-        
+
         $app->render('dispatch-par-date', [
             'besoins_par_matiere' => $besoins_par_matiere,
             'dons_non_distribues' => $dons_non_distribues
@@ -360,7 +360,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/dispatch-par-min', function () use ($app) {
         $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereByQuantite();
         $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
-        
+
         $app->render('dispatch-par-min', [
             'besoins_par_matiere' => $besoins_par_matiere,
             'dons_non_distribues' => $dons_non_distribues
@@ -371,7 +371,7 @@ $router->group('', function (Router $router) use ($app) {
     $router->get('/dispatch-proportionnel', function () use ($app) {
         $besoins_par_matiere = Besoin::getBesoinsGroupedByMatiereProportionnel();
         $dons_non_distribues = Dons::getDonsNonDistribuesGroupedByMatiere();
-        
+
         $app->render('dispatch-proportionnel', [
             'besoins_par_matiere' => $besoins_par_matiere,
             'dons_non_distribues' => $dons_non_distribues
@@ -380,24 +380,11 @@ $router->group('', function (Router $router) use ($app) {
 
     // API pour valider et dispatcher les dons
     $router->post('/api/dispatch/valider', function () use ($app) {
-        $type_dispatch = $_POST['type_dispatch'] ?? null;
-        $repartition_json = $_POST['repartition'] ?? '[]';
-        
-        if (!$type_dispatch) {
-            \Flight::redirect('/dispatch-par-date');
-            return;
-        }
-        
-        // Décoder les données de repartition
-        $repartition = json_decode($repartition_json, true);
-        
-        $result = DispatchController::validerDispatch($repartition);
-        
+        $result = DispatchController::dispatcherSimple();
+
         if ($result['success']) {
-            error_log('[SUCCESS] ' . $result['message']);
-            \Flight::redirect('/dashboard?success=' . urlencode($result['message']));
+            \Flight::redirect('/dispatch-par-date?success=' . urlencode($result['message']));
         } else {
-            error_log('[ERROR] ' . $result['message']);
             \Flight::redirect('/dispatch-par-date?error=' . urlencode($result['message']));
         }
     });
@@ -405,7 +392,7 @@ $router->group('', function (Router $router) use ($app) {
     // Route pour réinitialiser toutes les données
     $router->post('/api/reinitialiser', function () use ($app) {
         $result = DispatchController::reinitialiser();
-        
+
         if ($result['success']) {
             error_log('[SUCCESS] ' . $result['message']);
             \Flight::redirect('/?success=' . urlencode($result['message']));
