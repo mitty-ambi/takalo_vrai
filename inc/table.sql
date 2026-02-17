@@ -48,8 +48,30 @@ create table Achats(
 
 CREATE TABLE Categorie(
     id_categorie INT primary key auto_increment,
-    nom varchar(100)
+    nom varchar(100),
+    date_creation DATE
 );
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(1, 'Électronique');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(3, 'Livres');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(4, 'Meubles');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(5, 'Jouets');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(6, 'Sports');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(7, 'Cuisine');
+INSERT INTO Categorie
+(id_categorie, nom)
+VALUES(8, 'Bijoux');
 -- 3. Insertion des matières
 INSERT INTO Matiere (nom_matiere, prix_unitaire, id_categorie) VALUES
 -- EN NATURE (id_categorie = 1)
