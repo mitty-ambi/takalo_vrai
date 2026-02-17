@@ -1,29 +1,46 @@
-to do list:
-    -(ok)mettre index.html dans views:
-        .(ok)placer les assets dependants:
-            *(ok)js
-            *(ok)css
-            *(ok)assets
-    -(ok)placement dans route.php:
-        .analytics.html
-        .users.html
-        .products.html
-        .orders.html
-        .forms.html
-        .elements.html
-        .elements-buttons.html
-        .elements-alerts.html
-        .elements-badges.html
-        .elements-cards.html
-        .elements-modals.html
-        .elements-forms.html
-        .elements-tables.html
-        .reports.html
-        .messages.html
-        .calendar.html
-        .settings.html
-        .files.html
-        .security.html
-        .help.html
-    -(ok)creer navbar.php pour un modele de navbar
-    -(ok)include le navbar dans tous les fichiers
+TODO LISTE PROJET
+Système de gestion des dons et des besoins
+
+TÂCHES TERMINÉES (OK)
+
+Architecture et base de données
+    OK - Architecture générale (MVC, template, organisation des dossiers) - ambinintsoa
+    OK - Création des tables (région, ville, don, besoin…) et relations - alan
+
+Authentification
+    OK - Système de connexion utilisateur
+    OK - Vérification des identifiants et protection des routes
+
+Gestion des besoins
+    OK - Page insertion besoin avec formulaire fonctionnel - dave
+    OK - Fonction insertion besoin (model, controller) avec enregistrement en base - dave
+    OK - Routage besoin correctement configuré - dave
+
+Gestion des dons
+    OK - Page insertion don avec formulaire - alan
+    OK - Fonction insertion don (model, controller) et validation des données - alan
+    OK - Routage don opérationnel - alan
+
+Dashboard et interface
+    OK - Dashboard avec affichage des statistiques principales - dave
+    OK - Design des pages et harmonisation visuelle - ambinintsoa
+    OK - Footer intégré au layout principal - ambinintsoa
+    OK - Dispatch pour centralisation de l’affichage - alan
+
+Gestion des villes
+    OK - Fonction liste des villes depuis la base - ambinintsoa
+    OK - Routage villes et affichage associé - ambinintsoa
+
+Filtres et affichages
+    OK - Filtre par ville avec affichage dynamique des besoins - ambinintsoa
+    OK - Fonction liste des dons par ville (requête filtrée) - alan
+    OK - Liste des dons par ville avec affichage structuré - alan
+
+Besoins restants
+    OK - Fonction calcul des besoins restants après dons - ambinintsoa
+    OK - Liste des besoins restants mise à jour correctement - ambinintsoa
+
+Simulation et dynamique
+    OK - Simulation de répartition des dons avec logique de calcul - alan
+    OK - Rafraîchissement des montants en Ajax sans rechargement - dave
+    OK - Fonction calcul achat intégrée aux prix unitaires - ambinintsoa
