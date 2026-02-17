@@ -21,9 +21,9 @@ create table Matiere(
     id_matiere int primary key auto_increment,
     nom_matiere varchar(100),
     prix_unitaire float,
-    id_categorie INT,
+    id_categorie INT
 );
-ALTER TABLE Matiere ADD id_categorie INT;
+ALTER TABLE Matiere ADD id_categorie INT
 create table Besoin(
     id_besoin int primary key auto_increment,
     id_matiere int,
@@ -44,7 +44,7 @@ create table Achats(
     statut varchar(50) default 'en_attente'
 );
 
-CREATE TABLE Categorie (
+CREATE TABLE Categorie(
     id_categorie INT primary key auto_increment,
     nom varchar(100)
 );

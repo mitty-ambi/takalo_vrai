@@ -11,8 +11,9 @@ class AchatController
 {
     /**
      * Créer un achat depuis un besoin avec dons en argent
+     * Le frais est passé par l'utilisateur.
      */
-    public static function createFromBesoin($id_besoin, $quantite = null)
+    public static function createFromBesoin($id_besoin, $quantite = null, $frais_achat = 0)
     {
         $besoin = Besoin::getById($id_besoin);
         if (!$besoin) {
@@ -24,7 +25,7 @@ class AchatController
         if (Achat::existeForBesoin($id_besoin)) {
             return [
                 'success' => false,
-                'message' => 'Un achat existe déjà pour ce besoin dans les dons restants'
+                'message' => 'Un achat existe déjà pour ce besoin'
             ];
         }
 
@@ -39,10 +40,7 @@ class AchatController
 
         // Utiliser la quantité fournie ou celle du besoin
         $quantite_achat = $quantite ?? $besoin['quantite'];
-
-        // Récupérer la configuration du frais
-        $config = \Flight::app()->config();
-        $frais_achat = $config['frais_achat'] ?? 10; // Par défaut 10%
+        $frais_achat = max(0, (float) $frais_achat);
 
         // Calculer le prix total
         $prix_base = $matiere['prix_unitaire'] * $quantite_achat;
@@ -62,18 +60,43 @@ class AchatController
             'en_attente'
         );
 
-        if ($achat->insert_base()) {
-            return [
-                'success' => true,
-                'message' => 'Achat créé avec succès',
-                'id_achat' => $achat->id_achat,
-                'prix_total' => $prix_total,
-                'frais' => $frais_achat
-            ];
-        } else {
+        try {
+            // Créer le Don (la quantité de matière acquise)
+            $don = new Dons(
+                null,
+                $besoin['id_matiere'],
+                $quantite_achat,
+                date('Y-m-d'),
+                $besoin['id_ville']
+            );
+            
+            if (!$don->insert_base()) {
+                return [
+                    'success' => false,
+                    'message' => 'Erreur lors de la création du don'
+                ];
+            }
+
+            // Créer l'enregistrement d'achat
+            if ($achat->insert_base()) {
+                return [
+                    'success' => true,
+                    'message' => "Achat créé avec succès (frais {$frais_achat}%)",
+                    'id_achat' => $achat->id_achat,
+                    'prix_total' => $prix_total,
+                    'frais' => $frais_achat
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Erreur lors de la création de l\'achat'
+                ];
+            }
+        } catch (Exception $e) {
+            error_log('[ERROR] createFromBesoin: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Erreur lors de la création de l\'achat'
+                'message' => 'Erreur lors de la création de l\'achat: ' . $e->getMessage()
             ];
         }
     }
@@ -120,11 +143,12 @@ class AchatController
 
     /**
      * Créer un achat avec un montant spécifique (depuis les besoins restants)
+     * $frais_achat est saisi par l'utilisateur.
      */
-    public static function creerAchat($id_matiere, $id_ville, $montant)
+    public static function creerAchat($id_matiere, $id_ville, $montant, $frais_achat = 0)
     {
         $DBH = \Flight::db();
-        $frais_achat = 10;
+        $frais_achat = max(0, (float) $frais_achat);
 
         // Récupérer le prix unitaire de la matière
         $sql_prix = "SELECT prix_unitaire FROM Matiere WHERE id_matiere = :id_matiere";
@@ -137,10 +161,12 @@ class AchatController
             return ['success' => false, 'message' => 'Matière non trouvée'];
         }
 
+        // Le montant est le montant de base (sans frais)
         // Calculer la quantité: montant / prix_unitaire
-        $quantite = $montant / $matiere['prix_unitaire'];
+        $quantite = floor($montant / $matiere['prix_unitaire']);
+        $montant_avec_frais = $montant * (1 + $frais_achat / 100);
 
-        // Insérer dans Dons
+        // Insérer dans Dons (quantité en nature obtenue)
         $sql_don = "INSERT INTO Dons (id_matiere, quantite, date_don, id_ville) VALUES (:id_matiere, :quantite, NOW(), :id_ville)";
         $stmt_don = $DBH->prepare($sql_don);
         $stmt_don->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
@@ -148,27 +174,36 @@ class AchatController
         $stmt_don->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
         $stmt_don->execute();
 
-        // Insérer dans Achats
+        // Insérer dans Achats (avec les frais)
         $sql_achat = "INSERT INTO Achats (id_ville, id_matiere, quantite, prix_unitaire, frais_pourcentage, prix_total_achat, date_achat, statut) 
-                      VALUES (:id_ville, :id_matiere, 1, :montant, :frais, :montant_total, NOW(), 'completé')";
+                      VALUES (:id_ville, :id_matiere, :quantite, :prix_unitaire, :frais, :montant_total, NOW(), 'completé')";
         $stmt_achat = $DBH->prepare($sql_achat);
         $stmt_achat->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
         $stmt_achat->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
-        $stmt_achat->bindValue(':montant', (float) $montant, \PDO::PARAM_STR);
+        $stmt_achat->bindValue(':quantite', (int) $quantite, \PDO::PARAM_INT);
+        $stmt_achat->bindValue(':prix_unitaire', (float) $matiere['prix_unitaire'], \PDO::PARAM_STR);
         $stmt_achat->bindValue(':frais', (float) $frais_achat, \PDO::PARAM_STR);
-        $stmt_achat->bindValue(':montant_total', (float) $montant, \PDO::PARAM_STR);
+        $stmt_achat->bindValue(':montant_total', (float) $montant_avec_frais, \PDO::PARAM_STR);
         $stmt_achat->execute();
 
-        return ['success' => true, 'message' => 'Achat créé'];
+        return [
+            'success' => true,
+            'message' => 'Achat créé avec succès',
+            'montant_base' => $montant,
+            'montant_avec_frais' => $montant_avec_frais,
+            'frais_pourcentage' => $frais_achat,
+            'quantite' => $quantite
+        ];
     }
 
     /**
      * Simuler un achat (sans vraiment l'enregistrer)
+     * $frais_achat est saisi par l'utilisateur.
      */
-    public static function simulerAchat($id_matiere, $id_ville, $montant)
+    public static function simulerAchat($id_matiere, $id_ville, $montant, $frais_achat = 0)
     {
         $DBH = \Flight::db();
-        $frais_achat = 10;
+        $frais_achat = max(0, (float) $frais_achat);
 
         // Récupérer le prix unitaire de la matière
         $sql_prix = "SELECT prix_unitaire, nom_matiere FROM Matiere WHERE id_matiere = :id_matiere";
@@ -182,33 +217,42 @@ class AchatController
         }
 
         // Récupérer le besoin restant pour cette matière et ville
-        $sql_restant = "SELECT 
-                            COALESCE(SUM(b.quantite), 0) as total_besoin,
-                            COALESCE(SUM(d.quantite), 0) as total_don,
-                            COALESCE(SUM(b.quantite), 0) - COALESCE(SUM(d.quantite), 0) as reste
-                        FROM Matiere m
-                        LEFT JOIN Besoin b ON m.id_matiere = b.id_matiere AND b.id_ville = :id_ville
-                        LEFT JOIN Dons d ON m.id_matiere = d.id_matiere AND d.id_ville = :id_ville
-                        WHERE m.id_matiere = :id_matiere";
-        $stmt_restant = $DBH->prepare($sql_restant);
-        $stmt_restant->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
-        $stmt_restant->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
-        $stmt_restant->execute();
-        $restant_data = $stmt_restant->fetch(\PDO::FETCH_ASSOC);
+        // Requêtes séparées pour éviter le produit cartésien
+        $sql_besoin = "SELECT COALESCE(SUM(b.quantite), 0) as total_besoin
+                       FROM Besoin b
+                       WHERE b.id_matiere = :id_matiere AND b.id_ville = :id_ville";
+        $stmt_b = $DBH->prepare($sql_besoin);
+        $stmt_b->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
+        $stmt_b->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
+        $stmt_b->execute();
+        $besoin_data = $stmt_b->fetch(\PDO::FETCH_ASSOC);
+
+        $sql_dons = "SELECT COALESCE(SUM(d.quantite), 0) as total_don
+                     FROM Dons d
+                     WHERE d.id_matiere = :id_matiere AND d.id_ville = :id_ville";
+        $stmt_d = $DBH->prepare($sql_dons);
+        $stmt_d->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
+        $stmt_d->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
+        $stmt_d->execute();
+        $don_data = $stmt_d->fetch(\PDO::FETCH_ASSOC);
+
+        $total_besoin = (float) $besoin_data['total_besoin'];
+        $total_don = (float) $don_data['total_don'];
+        $reste = $total_besoin - $total_don;
 
         // Calculer les valeurs
-        $quantite_achetee = $montant / $matiere['prix_unitaire'];
+        $quantite_achetee = floor($montant / $matiere['prix_unitaire']);
         $montant_avec_frais = $montant * (1 + $frais_achat / 100);
-        $montant_restant_theorique = ($restant_data['reste'] - $quantite_achetee) * $matiere['prix_unitaire'];
+        $montant_restant_theorique = ($reste - $quantite_achetee) * $matiere['prix_unitaire'];
 
         // Vérifications
-        if ($montant > ($restant_data['reste'] * $matiere['prix_unitaire'])) {
+        if ($montant > ($reste * $matiere['prix_unitaire'])) {
             return [
                 'success' => false, 
                 'message' => 'Le montant dépasse le besoin restant',
                 'montant_demande' => $montant,
-                'montant_restant' => $restant_data['reste'] * $matiere['prix_unitaire'],
-                'quantite_restante' => $restant_data['reste']
+                'montant_restant' => $reste * $matiere['prix_unitaire'],
+                'quantite_restante' => $reste
             ];
         }
 
@@ -222,32 +266,31 @@ class AchatController
             'frais_pourcentage' => $frais_achat,
             'frais_montant' => $montant * ($frais_achat / 100),
             'montant_total_achat' => $montant_avec_frais,
-            'quantite_restante' => $restant_data['reste'],
-            'quantite_apres_achat' => $restant_data['reste'] - $quantite_achetee,
+            'quantite_restante' => $reste,
+            'quantite_apres_achat' => $reste - $quantite_achetee,
             'montant_restant_apres' => $montant_restant_theorique
         ];
     }
 
     /**
      * Valider et enregistrer un achat
+     * $frais_achat est saisi par l'utilisateur.
      */
-    public static function validerAchat($id_matiere, $id_ville, $montant)
+    public static function validerAchat($id_matiere, $id_ville, $montant, $frais_achat = 0)
     {
         $DBH = \Flight::db();
+        $frais_achat = max(0, (float) $frais_achat);
         
         // Vérifier d'abord avec la simulation
-        $simulation = self::simulerAchat($id_matiere, $id_ville, $montant);
+        $simulation = self::simulerAchat($id_matiere, $id_ville, $montant, $frais_achat);
         if (!$simulation['success']) {
             return $simulation;
         }
 
-        $frais_achat = 10;
-        $matiere = [
-            'prix_unitaire' => $simulation['prix_unitaire']
-        ];
+        $prix_unitaire = $simulation['prix_unitaire'];
 
         // Calculer la quantité: montant / prix_unitaire
-        $quantite = $montant / $matiere['prix_unitaire'];
+        $quantite = floor($montant / $prix_unitaire);
         $montant_avec_frais = $montant * (1 + $frais_achat / 100);
 
         try {
@@ -266,7 +309,7 @@ class AchatController
             $stmt_achat->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
             $stmt_achat->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
             $stmt_achat->bindValue(':quantite', intval($quantite), \PDO::PARAM_INT);
-            $stmt_achat->bindValue(':prix_unitaire', (float) $matiere['prix_unitaire'], \PDO::PARAM_STR);
+            $stmt_achat->bindValue(':prix_unitaire', (float) $prix_unitaire, \PDO::PARAM_STR);
             $stmt_achat->bindValue(':frais', (float) $frais_achat, \PDO::PARAM_STR);
             $stmt_achat->bindValue(':montant_total', (float) $montant_avec_frais, \PDO::PARAM_STR);
             $stmt_achat->execute();
@@ -276,6 +319,7 @@ class AchatController
                 'message' => 'Achat enregistré avec succès',
                 'montant_don' => $montant,
                 'montant_achat_avec_frais' => $montant_avec_frais,
+                'frais_pourcentage' => $frais_achat,
                 'quantite' => intval($quantite)
             ];
         } catch (\Exception $e) {
