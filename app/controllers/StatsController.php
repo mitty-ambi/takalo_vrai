@@ -50,6 +50,7 @@ class StatsController
     /**
      * Récupérer les statistiques par ville
      * Retourne: tableau de villes avec montants total, satisfait, restant
+     * Satisfait = dons assignés à la ville ET correspondant à un besoin de cette ville
      */
     public static function getStatsByVilles()
     {
@@ -59,12 +60,28 @@ class StatsController
                     v.id_ville,
                     v.nom_ville,
                     COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total,
-                    COALESCE(SUM(d.quantite * m2.prix_unitaire), 0) as montant_satisfait,
-                    COALESCE(SUM(b.quantite * m.prix_unitaire), 0) - COALESCE(SUM(d.quantite * m2.prix_unitaire), 0) as montant_restant
+                    COALESCE(SUM(CASE 
+                        WHEN d.id_ville = v.id_ville AND EXISTS (
+                            SELECT 1 FROM Besoin b2 
+                            WHERE b2.id_ville = v.id_ville 
+                            AND b2.id_matiere = d.id_matiere
+                        )
+                        THEN d.quantite * m2.prix_unitaire 
+                        ELSE 0 
+                    END), 0) as montant_satisfait,
+                    COALESCE(SUM(b.quantite * m.prix_unitaire), 0) - COALESCE(SUM(CASE 
+                        WHEN d.id_ville = v.id_ville AND EXISTS (
+                            SELECT 1 FROM Besoin b2 
+                            WHERE b2.id_ville = v.id_ville 
+                            AND b2.id_matiere = d.id_matiere
+                        )
+                        THEN d.quantite * m2.prix_unitaire 
+                        ELSE 0 
+                    END), 0) as montant_restant
                   FROM Ville v
                   LEFT JOIN Besoin b ON v.id_ville = b.id_ville
                   LEFT JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  LEFT JOIN Dons d ON v.id_ville = d.id_ville
+                  LEFT JOIN Dons d ON d.id_ville > 0
                   LEFT JOIN Matiere m2 ON d.id_matiere = m2.id_matiere
                   GROUP BY v.id_ville, v.nom_ville
                   ORDER BY v.nom_ville";

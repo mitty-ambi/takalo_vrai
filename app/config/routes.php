@@ -336,11 +336,23 @@ $router->group('', function (Router $router) use ($app) {
         \Flight::json($stats);
     });
 
+    // API pour stats par ville
+    $router->get('/api/stats/villes', function () use ($app) {
+        $stats_villes = \app\controllers\StatsController::getStatsByVilles();
+        \Flight::json($stats_villes);
+    });
+
     // API pour récupérer les besoins restants (non achetés)
     $router->get('/api/besoins/remaining', function () use ($app) {
         $besoins = Besoin::getBesoinsRestants();
         \Flight::json($besoins);
     });
+
+    // Page de récapitulation globale
+    $router->get('/recap', function () use ($app) {
+        $app->render('recap');
+    });
+
     $router->get('/simulation', function () use ($app) {
         $app->render('simulation'); // affichera app/views/simulation.php
     });
