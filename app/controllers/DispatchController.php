@@ -86,56 +86,53 @@ class DispatchController
      */
     public static function dispatcherSimple($id_matiere = null)
     {
-        $dons_non_distribues = Dons::getDonsNonDistribuee();
-
-        if (empty($dons_non_distribues)) {
-            return ['success' => false, 'message' => 'Aucun don à dispatcher'];
-        }
-
-        // Filtrer par matière si demandé
-        if ($id_matiere !== null) {
-            $dons_non_distribues = array_filter($dons_non_distribues, function ($don) use ($id_matiere) {
-                return $don['id_matiere'] == $id_matiere;
-            });
-
-            if (empty($dons_non_distribues)) {
-                return ['success' => false, 'message' => 'Aucun don à dispatcher pour cette matière'];
-            }
-        }
-
         $DBH = \Flight::db();
         $DBH->beginTransaction();
 
         try {
             $updated = 0;
 
-            // Récupérer tous les besoins
-            $besoins = Besoin::getAll();
-
-            // Filtrer les besoins par matière si demandé
+            // Récupérer tous les besoins, triés par date de demande
+            $query_besoins = "SELECT b.id_besoin, b.id_matiere, b.id_ville, b.quantite 
+                              FROM Besoin b WHERE b.quantite > 0";
             if ($id_matiere !== null) {
-                $besoins = array_filter($besoins, function ($besoin) use ($id_matiere) {
-                    return $besoin['id_matiere'] == $id_matiere;
-                });
+                $query_besoins .= " AND b.id_matiere = :id_matiere";
+            }
+            $query_besoins .= " ORDER BY b.date_du_demande ASC";
+            
+            $stmt_besoins = $DBH->prepare($query_besoins);
+            if ($id_matiere !== null) {
+                $stmt_besoins->bindValue(':id_matiere', (int) $id_matiere, \PDO::PARAM_INT);
+            }
+            $stmt_besoins->execute();
+            $besoins = $stmt_besoins->fetchAll(\PDO::FETCH_ASSOC);
+
+            if (empty($besoins)) {
+                $DBH->rollBack();
+                return ['success' => false, 'message' => 'Aucun besoin trouvé'];
             }
 
-            // Pour chaque besoin, chercher un don correspondant
+            // Pour chaque besoin, distribuer à partir des dons non distribués
             foreach ($besoins as $besoin) {
-                $id_ville = $besoin['id_ville'];
-                $besoin_id_matiere = $besoin['id_matiere'];
+                $quantite_restante = $besoin['quantite'];
+                
+                // Récupérer les dons non distribués FRAIS (re-query à chaque fois pour voir l'état actuel)
+                $dons = Dons::getDonsNonDistribuesPourDispatch($besoin['id_matiere']);
+                
+                if (empty($dons)) continue;
 
-                // Chercher un don correspondant à cette matière et non encore distribué
-                foreach ($dons_non_distribues as $don) {
-                    if ($don['id_matiere'] == $besoin_id_matiere && $don['id_ville'] == 0) {
-                        $query = "UPDATE Dons SET id_ville = :id_ville WHERE id_don = :id_don";
-                        $stmt = $DBH->prepare($query);
-                        $stmt->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
-                        $stmt->bindValue(':id_don', (int) $don['id_don'], \PDO::PARAM_INT);
+                foreach ($dons as $don) {
+                    if ($quantite_restante <= 0) break;
+                    if ($don['quantite'] <= 0) continue;
 
-                        if ($stmt->execute()) {
-                            $updated++;
-                        }
-                        break;
+                    $quantite_a_prendre = min($don['quantite'], $quantite_restante);
+
+                    // Utiliser dispatcherDon qui divise correctement le don
+                    $ok = Dons::dispatcherDon($don['id_don'], $besoin['id_ville'], $quantite_a_prendre);
+
+                    if ($ok) {
+                        $quantite_restante -= $quantite_a_prendre;
+                        $updated++;
                     }
                 }
             }

@@ -272,7 +272,7 @@ class Dons
     {
         $DBH = \Flight::db();
         $query = "SELECT id_don, quantite FROM Dons 
-                  WHERE id_matiere = :id_matiere AND id_ville = 0
+                  WHERE id_matiere = :id_matiere AND id_ville = 0 AND quantite > 0
                   ORDER BY date_don ASC";
         $stmt = $DBH->prepare($query);
         $stmt->bindValue(':id_matiere', $id_matiere, PDO::PARAM_INT);
@@ -286,23 +286,78 @@ class Dons
     public static function dispatcherDon($id_don, $id_ville, $quantite_a_prendre)
     {
         $DBH = \Flight::db();
-        $query = "UPDATE Dons SET id_ville = :id_ville, quantite = quantite - :quantite_a_prendre 
-                  WHERE id_don = :id_don";
-        $stmt = $DBH->prepare($query);
-        $stmt->bindValue(':id_ville', $id_ville, PDO::PARAM_INT);
-        $stmt->bindValue(':quantite_a_prendre', $quantite_a_prendre, PDO::PARAM_INT);
-        $stmt->bindValue(':id_don', $id_don, PDO::PARAM_INT);
-        return $stmt->execute();
+        
+        // Récupérer les informations du don original
+        $query_select = "SELECT id_matiere, date_don FROM Dons WHERE id_don = :id_don";
+        $stmt_select = $DBH->prepare($query_select);
+        $stmt_select->bindValue(':id_don', $id_don, PDO::PARAM_INT);
+        $stmt_select->execute();
+        $don = $stmt_select->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$don) {
+            return false;
+        }
+        
+        // Créer une nouvelle ligne de don pour cette allocation
+        $query_insert = "INSERT INTO Dons (id_matiere, quantite, date_don, id_ville) 
+                         VALUES (:id_matiere, :quantite, :date_don, :id_ville)";
+        $stmt_insert = $DBH->prepare($query_insert);
+        $stmt_insert->bindValue(':id_matiere', $don['id_matiere'], PDO::PARAM_INT);
+        $stmt_insert->bindValue(':quantite', $quantite_a_prendre, PDO::PARAM_INT);
+        $stmt_insert->bindValue(':date_don', $don['date_don']);
+        $stmt_insert->bindValue(':id_ville', $id_ville, PDO::PARAM_INT);
+        
+        if ($stmt_insert->execute()) {
+            // Réduire la quantité du don original
+            $query_update = "UPDATE Dons SET quantite = quantite - :quantite_a_prendre 
+                           WHERE id_don = :id_don AND quantite >= :quantite_a_prendre";
+            $stmt_update = $DBH->prepare($query_update);
+            $stmt_update->bindValue(':quantite_a_prendre', $quantite_a_prendre, PDO::PARAM_INT);
+            $stmt_update->bindValue(':id_don', $id_don, PDO::PARAM_INT);
+            return $stmt_update->execute();
+        }
+        
+        return false;
     }
 
     /**
-     * Réinitialiser tous les dons (id_ville = 0)
+     * Réinitialiser tous les dons : regrouper les dons répartis avec leur don original
+     * Pour chaque groupe (même id_matiere, même date_don), on garde un seul don
+     * avec la somme des quantités et id_ville = 0
      */
     public static function reinitialiserTous()
     {
         $DBH = \Flight::db();
-        $query = "UPDATE Dons SET id_ville = 0";
-        return $DBH->exec($query);
+        
+        // 1. Regrouper : pour chaque (id_matiere, date_don), calculer la somme des quantités
+        $query_groupes = "SELECT id_matiere, date_don, SUM(quantite) as total_quantite, MIN(id_don) as id_don_a_garder
+                          FROM Dons
+                          GROUP BY id_matiere, date_don
+                          HAVING COUNT(*) > 1";
+        $groupes = $DBH->query($query_groupes)->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($groupes as $groupe) {
+            // Mettre à jour le don qu'on garde avec la quantité totale et id_ville = 0
+            $query_update = "UPDATE Dons SET quantite = :total, id_ville = 0 
+                           WHERE id_don = :id_don";
+            $stmt = $DBH->prepare($query_update);
+            $stmt->bindValue(':total', $groupe['total_quantite'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_don', $groupe['id_don_a_garder'], PDO::PARAM_INT);
+            $stmt->execute();
+            
+            // Supprimer les autres dons du même groupe
+            $query_delete = "DELETE FROM Dons 
+                           WHERE id_matiere = :id_matiere AND date_don = :date_don AND id_don != :id_don";
+            $stmt_del = $DBH->prepare($query_delete);
+            $stmt_del->bindValue(':id_matiere', $groupe['id_matiere'], PDO::PARAM_INT);
+            $stmt_del->bindValue(':date_don', $groupe['date_don']);
+            $stmt_del->bindValue(':id_don', $groupe['id_don_a_garder'], PDO::PARAM_INT);
+            $stmt_del->execute();
+        }
+        
+        // 2. Les dons qui n'étaient pas groupés, juste remettre id_ville = 0
+        $query_reste = "UPDATE Dons SET id_ville = 0";
+        return $DBH->exec($query_reste);
     }
 }
 

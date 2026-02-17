@@ -212,7 +212,8 @@
             Par exemple: si Tana demande 5 unités et il y a 6 dons disponibles, Tana reçoit floor(5/6) = 0 unités.
         </div>
 
-        <form method="POST" action="<?= $base_url ?>/api/dispatch/valider">
+        <form id="dispatchForm" method="POST" action="<?= $base_url ?>/api/dispatch/valider">
+            <input type="hidden" name="repartition" id="repartitionData" value="[]">
 
             <?php foreach ($besoins_par_matiere as $id_matiere => $matiere_data): ?>
                 <?php if (!isset($dons_non_distribues[$id_matiere]) || empty($dons_non_distribues[$id_matiere])): ?>
@@ -324,6 +325,31 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.getElementById('dispatchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collecter les données de repartition depuis le tableau
+            const repartitionData = [];
+            document.querySelectorAll('tbody tr[data-id-besoin]').forEach(row => {
+                const quantite = parseInt(row.getAttribute('data-quantite'));
+                if (quantite > 0) {
+                    repartitionData.push({
+                        id_besoin: parseInt(row.getAttribute('data-id-besoin')),
+                        id_ville: parseInt(row.getAttribute('data-id-ville')),
+                        quantite: quantite
+                    });
+                }
+            });
+            
+            // Mettre à jour le champ caché
+            document.getElementById('repartitionData').value = JSON.stringify(repartitionData);
+            
+            // Soumettre le formulaire
+            this.submit();
+        });
+    </script>
 </body>
 
 </html>

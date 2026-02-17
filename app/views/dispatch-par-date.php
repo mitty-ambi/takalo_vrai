@@ -215,7 +215,8 @@
             Les demandes plus récentes reçoivent ce qui reste après satisfaction des demandes plus anciennes.
         </div>
 
-        <form method="POST" action="<?= $base_url ?>/api/dispatch/valider">
+        <form id="dispatchForm" method="POST" action="<?= $base_url ?>/api/dispatch/valider">
+            <input type="hidden" name="repartition" id="repartitionData" value="[]">
 
             <?php
             error_log('[DEBUG VUE] besoins_par_matiere: ' . json_encode($besoins_par_matiere));
@@ -302,16 +303,34 @@
 
             <div class="btn-group">
                 <button type="button" class="btn btn-retour" onclick="history.back()">← Retour</button>
-                <form method="POST" action="<?= $base_url ?>/api/dispatch/valider" style="flex: 1;">
-                    <button type="submit" class="btn btn-valider" style="width: 100%;">✓ Valider le Dispatch</button>
-                </form>
+                <button type="submit" class="btn btn-valider" style="flex: 1;">✓ Valider le Dispatch</button>
             </div>
         </form>
     </div>
 
-
     <script>
-        // Pas de JavaScript complexe - simple POST
+        document.getElementById('dispatchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collecter les données de repartition depuis le tableau
+            const repartitionData = [];
+            document.querySelectorAll('tbody tr[data-id-besoin]').forEach(row => {
+                const quantite = parseInt(row.getAttribute('data-quantite'));
+                if (quantite > 0) {
+                    repartitionData.push({
+                        id_besoin: parseInt(row.getAttribute('data-id-besoin')),
+                        id_ville: parseInt(row.getAttribute('data-id-ville')),
+                        quantite: quantite
+                    });
+                }
+            });
+            
+            // Mettre à jour le champ caché
+            document.getElementById('repartitionData').value = JSON.stringify(repartitionData);
+            
+            // Soumettre le formulaire
+            this.submit();
+        });
     </script>
 </body>
 

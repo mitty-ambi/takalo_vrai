@@ -380,12 +380,16 @@ $router->group('', function (Router $router) use ($app) {
 
     // API pour valider et dispatcher les dons
     $router->post('/api/dispatch/valider', function () use ($app) {
-        $result = DispatchController::dispatcherSimple();
+        // Récupérer les données POST
+        $repartition_json = $_POST['repartition'] ?? '[]';
+        $repartition = json_decode($repartition_json, true);
+        
+        $result = DispatchController::validerDispatch($repartition);
 
         if ($result['success']) {
-            \Flight::redirect('/dispatch-par-date?success=' . urlencode($result['message']));
+            \Flight::redirect('/?success=' . urlencode($result['message']));
         } else {
-            \Flight::redirect('/dispatch-par-date?error=' . urlencode($result['message']));
+            \Flight::redirect('/?error=' . urlencode($result['message']));
         }
     });
 
