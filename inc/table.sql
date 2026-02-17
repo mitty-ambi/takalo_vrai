@@ -32,6 +32,7 @@ create table Besoin(
     date_du_demande datetime default current_timestamp
 );
 
+ALTER TABLE Besoin ADD date_du_demande datetime default current_timestamp;
 create table Achats(
     id_achat int primary key auto_increment,
     id_besoin int,
