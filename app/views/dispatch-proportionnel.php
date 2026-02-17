@@ -290,6 +290,7 @@
                                 }
 
                                 foreach ($distributions as $dist):
+                                    $a = 0;
                                     $besoin = $dist['besoin'];
                                     $attribution = $dist['part_entiere'];
                                     ?>
