@@ -80,14 +80,27 @@ class DispatchController
 
     /**
      * Dispatcher simple : assigner les dons non distribués aux villes avec besoins
+     * Optionnellement : dispatcher une seule matière
+     * @param int|null $id_matiere Si fourni, dispatcher seulement cette matière
      * @return array ['success' => bool, 'message' => string]
      */
-    public static function dispatcherSimple()
+    public static function dispatcherSimple($id_matiere = null)
     {
         $dons_non_distribues = Dons::getDonsNonDistribuee();
 
         if (empty($dons_non_distribues)) {
             return ['success' => false, 'message' => 'Aucun don à dispatcher'];
+        }
+
+        // Filtrer par matière si demandé
+        if ($id_matiere !== null) {
+            $dons_non_distribues = array_filter($dons_non_distribues, function ($don) use ($id_matiere) {
+                return $don['id_matiere'] == $id_matiere;
+            });
+
+            if (empty($dons_non_distribues)) {
+                return ['success' => false, 'message' => 'Aucun don à dispatcher pour cette matière'];
+            }
         }
 
         $DBH = \Flight::db();
@@ -99,15 +112,21 @@ class DispatchController
             // Récupérer tous les besoins
             $besoins = Besoin::getAll();
 
+            // Filtrer les besoins par matière si demandé
+            if ($id_matiere !== null) {
+                $besoins = array_filter($besoins, function ($besoin) use ($id_matiere) {
+                    return $besoin['id_matiere'] == $id_matiere;
+                });
+            }
+
             // Pour chaque besoin, chercher un don correspondant
             foreach ($besoins as $besoin) {
                 $id_ville = $besoin['id_ville'];
-                $id_matiere = $besoin['id_matiere'];
+                $besoin_id_matiere = $besoin['id_matiere'];
 
                 // Chercher un don correspondant à cette matière et non encore distribué
                 foreach ($dons_non_distribues as $don) {
-                    if ($don['id_matiere'] == $id_matiere && $don['id_ville'] == 0) {
-                        // Dispatcher ce don à la ville
+                    if ($don['id_matiere'] == $besoin_id_matiere && $don['id_ville'] == 0) {
                         $query = "UPDATE Dons SET id_ville = :id_ville WHERE id_don = :id_don";
                         $stmt = $DBH->prepare($query);
                         $stmt->bindValue(':id_ville', (int) $id_ville, \PDO::PARAM_INT);
