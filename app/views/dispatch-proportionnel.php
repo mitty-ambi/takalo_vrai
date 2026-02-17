@@ -200,7 +200,7 @@
 <body>
     <?php include("navbar.php"); ?>
 
-    <div class="container">
+    <div class="container"> 
         <div class="header">
             <h1>📊 Dispatch Proportionnel</h1>
             <p>Distribution basée sur le ratio: quantité demandée / nombre de dons disponibles</p>

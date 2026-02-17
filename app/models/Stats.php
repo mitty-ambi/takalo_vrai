@@ -20,24 +20,35 @@ class Stats
                         JOIN Matiere m ON b.id_matiere = m.id_matiere";
         $total = $DBH->query($query_total)->fetch(PDO::FETCH_ASSOC);
 
-        // Besoins satisfaits en montant (dons assignés à une ville ET qui correspondent à un besoin de cette ville)
-        $query_satisfait = "SELECT COALESCE(SUM(d.quantite * m.prix_unitaire), 0) as montant_satisfait
-                           FROM Dons d
-                           JOIN Matiere m ON d.id_matiere = m.id_matiere
-                           WHERE d.id_ville > 0 
-                           AND EXISTS (
-                               SELECT 1 FROM Besoin b 
-                               WHERE b.id_ville = d.id_ville 
-                               AND b.id_matiere = d.id_matiere
-                           )";
-        $satisfait = $DBH->query($query_satisfait)->fetch(PDO::FETCH_ASSOC);
+        // Besoins satisfaits = MIN(quantité reçue, quantité demandée) × prix_unitaire
+        // On ne peut pas satisfaire PLUS que ce qui est demandé
+        $query_satisfait = "SELECT 
+                                b.id_besoin,
+                                b.id_ville,
+                                b.id_matiere,
+                                b.quantite as besoin,
+                                m.prix_unitaire,
+                                COALESCE((SELECT SUM(d.quantite) 
+                                         FROM Dons d 
+                                         WHERE d.id_ville = b.id_ville 
+                                         AND d.id_matiere = b.id_matiere), 0) as recu
+                            FROM Besoin b
+                            JOIN Matiere m ON b.id_matiere = m.id_matiere";
+        $besoins = $DBH->query($query_satisfait)->fetchAll(PDO::FETCH_ASSOC);
+
+        $montant_satisfait = 0;
+        foreach ($besoins as $besoin) {
+            // Plafonner au besoin : on ne peut pas être satisfait à plus de 100%
+            $quantite_satisfaite = min((float) $besoin['besoin'], (float) $besoin['recu']);
+            $montant_satisfait += $quantite_satisfaite * (float) $besoin['prix_unitaire'];
+        }
 
         // Besoins restants
-        $montant_restant = $total['montant_total'] - $satisfait['montant_satisfait'];
+        $montant_restant = $total['montant_total'] - $montant_satisfait;
 
         return [
             'montant_total' => (float) $total['montant_total'],
-            'montant_satisfait' => (float) $satisfait['montant_satisfait'],
+            'montant_satisfait' => (float) $montant_satisfait,
             'montant_restant' => (float) $montant_restant
         ];
     }
