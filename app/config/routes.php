@@ -335,7 +335,7 @@ $router->group('', function (Router $router) use ($app) {
         $stats = Stats::getRecapGlobal();
         \Flight::json($stats);
     });
-
+    
     // API pour récupérer les besoins restants (non achetés)
     $router->get('/api/besoins/remaining', function () use ($app) {
         $besoins = Besoin::getBesoinsRestants();

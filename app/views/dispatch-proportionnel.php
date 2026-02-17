@@ -327,9 +327,9 @@
     </div>
 
     <script>
-        document.getElementById('dispatchForm').addEventListener('submit', function(e) {
+        document.getElementById('dispatchForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             // Collecter les données de repartition depuis le tableau
             const repartitionData = [];
             document.querySelectorAll('tbody tr[data-id-besoin]').forEach(row => {
@@ -342,10 +342,10 @@
                     });
                 }
             });
-            
+
             // Mettre à jour le champ caché
             document.getElementById('repartitionData').value = JSON.stringify(repartitionData);
-            
+
             // Soumettre le formulaire
             this.submit();
         });
