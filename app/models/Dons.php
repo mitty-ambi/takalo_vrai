@@ -166,4 +166,79 @@ class Dons
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Récupérer le montant total en argent disponible pour une ville
+     * (dons en argent non distribués OU distribués à cette ville)
+     */
+    public static function getMontantArgentDisponible($id_ville)
+    {
+        $DBH = \Flight::db();
+        // Récupérer l'ID de la catégorie "Argent"
+        $query_categorie = "SELECT id_categorie FROM Categorie WHERE nom = 'Argent'";
+        $stmt_cat = $DBH->query($query_categorie);
+        $categorie = $stmt_cat->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$categorie) {
+            return 0; // Catégorie "Argent" non trouvée
+        }
+        
+        $id_categorie_argent = $categorie['id_categorie'];
+        
+        // Récupérer le montant total des dons en argent (non distribués OU distribués à cette ville)
+        $query = "SELECT COALESCE(SUM(m.prix_unitaire * d.quantite), 0) as montant_total
+                  FROM Dons d
+                  JOIN Matiere m ON d.id_matiere = m.id_matiere
+                  WHERE m.id_categorie = :id_categorie_argent
+                  AND (d.id_ville = 0 OR d.id_ville = :id_ville)";
+        
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_categorie_argent', (int) $id_categorie_argent, PDO::PARAM_INT);
+        $stmt->bindValue(':id_ville', (int) $id_ville, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (float) ($result['montant_total'] ?? 0);
+    }
+
+    /**
+     * Récupérer les dons non distribués d'une matière spécifique
+     * (id_ville = 0)
+     */
+    public static function getDonsNonDistribuesByMatiere($id_matiere)
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT d.*, m.nom_matiere, m.id_categorie, c.nom
+                  FROM Dons d
+                  JOIN Matiere m ON d.id_matiere = m.id_matiere
+                  LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie
+                  WHERE d.id_matiere = :id_matiere
+                  AND d.id_ville = 0
+                  ORDER BY d.date_don ASC";
+        
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_matiere', (int) $id_matiere, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Récupérer la quantité totale disponible (non distribuée) d'une matière
+     */
+    public static function getQuantiteTotalNonDistribuee($id_matiere)
+    {
+        $DBH = \Flight::db();
+        $query = "SELECT COALESCE(SUM(quantite), 0) as quantite_total
+                  FROM Dons
+                  WHERE id_matiere = :id_matiere
+                  AND id_ville = 0";
+        
+        $stmt = $DBH->prepare($query);
+        $stmt->bindValue(':id_matiere', (int) $id_matiere, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) ($result['quantite_total'] ?? 0);
+    }
 }
+

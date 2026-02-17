@@ -62,23 +62,28 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        gap: 5px;
+        gap: 2px;
+        align-items: center;
+        flex-wrap: nowrap;
+        overflow-x: auto;
     }
 
     .nav-menu li {
         margin: 0;
+        flex-shrink: 0;
     }
 
     .nav-link {
-        display: block;
-        padding: 10px 20px;
+        display: inline-block;
+        padding: 8px 14px;
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
         font-weight: 500;
-        font-size: 1rem;
-        border-radius: 30px;
+        font-size: 0.95rem;
+        border-radius: 20px;
         transition: all 0.3s ease;
         white-space: nowrap;
+        line-height: 1.2;
     }
 
     .nav-link:hover {
@@ -98,9 +103,10 @@
         background: #CC3300;
         color: white !important;
         font-weight: 600;
-        padding: 10px 25px !important;
-        margin-left: 10px;
-        border: 2px solid #FF6600;
+        padding: 8px 14px !important;
+        margin-left: 4px;
+        border: 1px solid #FF6600;
+        font-size: 0.9rem;
     }
 
     .nav-don:hover {
@@ -182,5 +188,127 @@
         .nav-menu {
             display: flex !important;
             flex-direction: row;
+        }
+    }
+
+    /* ===== Menu déroulant (dropdown) ===== */
+    .nav-dropdown {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .nav-dropdown > .nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .nav-dropdown > .nav-link::after {
+        content: '▼';
+        font-size: 0.5rem;
+        display: inline-block;
+    }
+
+    /* Submenu styling */
+    .nav-submenu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Desktop: Dropdown menu */
+    @media screen and (min-width: 993px) {
+        .nav-submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #002244;
+            border: 1px solid #FF6600;
+            border-radius: 4px;
+            padding: 8px 0;
+            margin-top: 2px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+        }
+
+        .nav-dropdown:hover > .nav-submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-submenu li {
+            margin: 0;
+        }
+
+        .nav-submenu .nav-link {
+            padding: 10px 16px;
+            color: rgba(255, 255, 255, 0.9);
+            border-radius: 0;
+            text-align: left;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .nav-submenu .nav-link::after {
+            content: '';
+            display: none;
+        }
+
+        .nav-submenu .nav-link:hover {
+            background: #FF6600;
+            color: white;
+            transform: none;
+            padding-left: 20px;
+        }
+    }
+
+    /* Mobile: Dropdown menu */
+    @media screen and (max-width: 992px) {
+        .nav-submenu {
+            position: static;
+            opacity: 0;
+            visibility: hidden;
+            max-height: 0;
+            overflow: hidden;
+            background: #001a33;
+            border: none;
+            border-top: 1px solid #FF6600;
+            margin: 0;
+            padding: 0;
+            transform: none;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+
+        .nav-dropdown.show > .nav-submenu {
+            opacity: 1;
+            visibility: visible;
+            max-height: 500px;
+            padding: 8px 0;
+        }
+
+        .nav-submenu li {
+            margin: 0;
+        }
+
+        .nav-submenu .nav-link {
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .nav-submenu .nav-link::after {
+            content: '';
+            display: none;
+        }
+
+        .nav-submenu .nav-link:hover {
+            transform: none;
         }
     }

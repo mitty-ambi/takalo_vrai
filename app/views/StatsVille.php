@@ -288,7 +288,25 @@
             var achatButtons = document.querySelectorAll('.btn-acheter');
             achatButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
-                    ouvrirModal(this);
+                    // Vérifier d'abord les dons non distribués
+                    var idMatiere = this.getAttribute('data-id-matiere');
+                    var idVille = '<?= isset($_GET['id_ville']) ? htmlspecialchars($_GET['id_ville']) : '' ?>';
+                    
+                    fetch('<?= $base_url ?>/api/achats/check-undistributed/' + idMatiere + '/' + idVille)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.has_undistributed_dons) {
+                                // Afficher modal de dispatch
+                                afficherModalDispatch(data);
+                            } else {
+                                // Pas de dons non distribués, ouvrir le formulaire d'achat
+                                ouvrirModal(this);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert('Erreur lors de la vérification des dons');
+                        });
                 });
             });
 
@@ -299,6 +317,46 @@
                     calculerMontant();
                 });
             }
+
+            // Event listener pour la soumission du formulaire d'achat
+            var achatForm = document.getElementById('achatForm');
+            if (achatForm) {
+                achatForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    
+                    var idMatiere = document.getElementById('id_matiere').value;
+                    var idVille = document.getElementById('id_ville').value;
+                    var montant = document.getElementById('montantFinal').value;
+                    var frais = document.getElementById('fraisFinal').value;
+                    
+                    // Envoyer la requête AJAX
+                    fetch('<?= $base_url ?>/api/achats/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'id_matiere=' + encodeURIComponent(idMatiere) + 
+                              '&id_ville=' + encodeURIComponent(idVille) + 
+                              '&montant=' + encodeURIComponent(montant) +
+                              '&frais=' + encodeURIComponent(frais)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Achat créé avec succès!');
+                            fermerModal();
+                            location.reload();
+                        } else {
+                            alert('Erreur: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Erreur lors de la création de l\'achat');
+                    });
+                });
+            }
+
         });
 
         function switchTab(tabName) {
@@ -352,6 +410,80 @@
         function fermerModal() {
             document.getElementById('achatModal').style.display = 'none';
         }
+
+        function afficherModalDispatch(data) {
+            // Créer le modal de dispatch dynamiquement
+            var modal = document.createElement('div');
+            modal.id = 'dispatchModal';
+            modal.style.cssText = 'display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001;';
+            
+            var modalContent = document.createElement('div');
+            modalContent.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;';
+            
+            var title = document.createElement('h2');
+            title.innerHTML = '⚠️ Dons non distribués disponibles';
+            
+            var message = document.createElement('p');
+            message.innerHTML = '<strong>' + data.quantite_disponible + ' unités</strong> de <strong>' + data.nom_matiere + '</strong> sont disponibles en dons non distribués. Veuillez les dispatcher à cette ville avant d\'acheter.';
+            message.style.cssText = 'color: #666; margin-bottom: 20px; line-height: 1.6;';
+            
+            // Afficher la liste des dons non distribués
+            var table = document.createElement('table');
+            table.style.cssText = 'width: 100%; border-collapse: collapse; margin-bottom: 20px;';
+            
+            var thead = document.createElement('thead');
+            thead.innerHTML = '<tr style="background: #f0f0f0;"><th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Date du Don</th><th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Quantité</th><th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Dispatcher</th></tr>';
+            table.appendChild(thead);
+            
+            var tbody = document.createElement('tbody');
+            data.dons.forEach(function(don) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td style="padding: 10px; border: 1px solid #ddd;">' + new Date(don.date_don).toLocaleDateString('fr-FR') + '</td>' +
+                              '<td style="padding: 10px; border: 1px solid #ddd;"><strong>' + don.quantite + '</strong></td>' +
+                              '<td style="padding: 10px; border: 1px solid #ddd;"><a href="/dispatch?id_don=' + don.id_don + '&id_ville=' + data.id_ville + '" target="_blank" class="btn btn-primary" style="padding: 5px 10px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">Dispatcher</a></td>';
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            
+            // Boutons d'action
+            var buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end;';
+            
+            var btnDispatcher = document.createElement('button');
+            btnDispatcher.textContent = '🔄 Aller aux dons';
+            btnDispatcher.style.cssText = 'padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            btnDispatcher.onclick = function() {
+                window.location.href = '/dispatch';
+            };
+            
+            var btnFermer = document.createElement('button');
+            btnFermer.textContent = 'Fermer';
+            btnFermer.style.cssText = 'padding: 10px 20px; background: #ccc; color: #333; border: none; border-radius: 4px; cursor: pointer;';
+            btnFermer.onclick = function() {
+                document.getElementById('dispatchModal').remove();
+            };
+            
+            buttonContainer.appendChild(btnDispatcher);
+            buttonContainer.appendChild(btnFermer);
+            
+            // Assembler le modal
+            modalContent.appendChild(title);
+            modalContent.appendChild(message);
+            modalContent.appendChild(table);
+            modalContent.appendChild(buttonContainer);
+            modal.appendChild(modalContent);
+            
+            // Ajouter au DOM
+            document.body.appendChild(modal);
+            
+            // Fermer en cliquant dehors
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
 
         function calculerMontant() {
             var pourcentage = parseInt(document.getElementById('pourcentage').value);

@@ -13,6 +13,27 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
     <link rel="stylesheet" href="<?= $base_url ?>/assets/css/gerer_besoins.css">
     <link rel="stylesheet" href="<?= $base_url ?>/assets/css/recap.css">
     <title>BNGRC - Accueil</title>
+    <style>
+        .btn-reset {
+            background: #dc3545 !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border: none !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            margin-left: 10px !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-reset:hover {
+            background: #c82333 !important;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+        .btn-reset:active {
+            transform: scale(0.98);
+        }
+    </style>
 </head>
 
 <body>
@@ -23,6 +44,7 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
         <div class="recap-title">
             <span>📊 Récapitulation Générale</span>
             <button class="btn-refresh" id="btnRefresh">🔄 Actualiser</button>
+            <button class="btn-reset" id="btnReinitialiser">🔴 Réinitialiser</button>
         </div>
         <div class="recap-grid">
             <div class="recap-card">
@@ -116,6 +138,20 @@ $csp_nonce = Flight::app()->get('csp_nonce') ?? '';
 
         // Event listener pour le bouton actualiser
         document.getElementById('btnRefresh').addEventListener('click', chargerStats);
+
+        // Event listener pour le bouton réinitialiser
+        document.getElementById('btnReinitialiser').addEventListener('click', function() {
+            if (confirm('⚠️ ATTENTION! Cette action va:\n\n✓ Supprimer TOUS les achats\n✓ Réinitialiser TOUS les dons comme non distribués\n✓ Conserver les besoins avec leur quantité initiale\n\nCette action est IRRÉVERSIBLE!\n\nÊtes-vous sûr(e)?')) {
+                if (confirm('Êtes-vous TRÈS sûr(e)? Cette action ne peut pas être annulée!')) {
+                    // Créer un formulaire et soumettre
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = baseUrl + '/api/reinitialiser';
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        });
 
         // Charger les stats au chargement de la page
         window.addEventListener('load', chargerStats);

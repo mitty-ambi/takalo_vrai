@@ -6,6 +6,8 @@ use app\models\Achat;
 use app\models\Besoin;
 use app\models\Matiere;
 use app\models\Dons;
+use Exception;
+use PDO;
 
 class AchatController
 {
@@ -22,19 +24,70 @@ class AchatController
                 'message' => 'Besoin non trouvé'
             ];
         }
-        if (Achat::existeForBesoin($id_besoin)) {
-            return [
-                'success' => false,
-                'message' => 'Un achat existe déjà pour ce besoin'
-            ];
-        }
-
-        // Récupérer la matière et son prix
+        
+        // Vérifier si le besoin est en argent
         $matiere = Matiere::getById($besoin['id_matiere']);
         if (!$matiere) {
             return [
                 'success' => false,
                 'message' => 'Matière non trouvée'
+            ];
+        }
+        
+        // Récupérer la catégorie de la matière
+        $DBH = \Flight::db();
+        $query_cat = "SELECT c.nom FROM Matiere m 
+                      LEFT JOIN Categorie c ON m.id_categorie = c.id_categorie 
+                      WHERE m.id_matiere = :id_matiere";
+        $stmt_cat = $DBH->prepare($query_cat);
+        $stmt_cat->bindValue(':id_matiere', (int) $besoin['id_matiere'], PDO::PARAM_INT);
+        $stmt_cat->execute();
+        $mat_info = $stmt_cat->fetch();
+        $is_argent = ($mat_info && $mat_info['nom'] === 'Argent');
+        
+        // Si ce n'est pas un besoin en argent
+        if (!$is_argent) {
+            // ÉTAPE 1: Vérifier les dons non distribués de cette matière
+            $dons_non_distribues = Dons::getDonsNonDistribuesByMatiere($besoin['id_matiere']);
+            $quantite_besoin = $quantite ?? $besoin['quantite'];
+            $quantite_disponible_non_distribuee = Dons::getQuantiteTotalNonDistribuee($besoin['id_matiere']);
+            
+            // S'il y a des dons non distribués, retourner un message avec la liste
+            if ($quantite_disponible_non_distribuee > 0) {
+                return [
+                    'success' => false,
+                    'message' => 'Dons non distribués disponibles',
+                    'has_undistributed_dons' => true,
+                    'quantite_disponible' => $quantite_disponible_non_distribuee,
+                    'quantite_besoin' => $quantite_besoin,
+                    'dons' => $dons_non_distribues,
+                    'id_besoin' => $id_besoin,
+                    'id_ville' => $besoin['id_ville'],
+                    'nom_matiere' => $matiere['nom_matiere']
+                ];
+            }
+            
+            // ÉTAPE 2: Si pas de dons non distribués, vérifier les dons en argent disponibles
+            $montant_disponible = Dons::getMontantArgentDisponible($besoin['id_ville']);
+            
+            // Calculer le prix total nécessaire
+            $frais_achat = max(0, (float) $frais_achat);
+            $prix_base = $matiere['prix_unitaire'] * $quantite_besoin;
+            $prix_total = Achat::calculateTotal($prix_base, $frais_achat);
+            
+            // Vérifier si le montant en argent est suffisant
+            if ($montant_disponible < $prix_total) {
+                return [
+                    'success' => false,
+                    'message' => "Montant en argent insuffisant. Nécessaire: " . number_format($prix_total, 2, ',', ' ') . " Ar. Disponible: " . number_format($montant_disponible, 2, ',', ' ') . " Ar"
+                ];
+            }
+        }
+        
+        if (Achat::existeForBesoin($id_besoin)) {
+            return [
+                'success' => false,
+                'message' => 'Un achat existe déjà pour ce besoin'
             ];
         }
 
@@ -149,6 +202,25 @@ class AchatController
     {
         $DBH = \Flight::db();
         $frais_achat = max(0, (float) $frais_achat);
+
+        // ÉTAPE 1: Vérifier les dons non distribués de cette matière
+        $dons_non_distribues = Dons::getDonsNonDistribuesByMatiere($id_matiere);
+        $quantite_disponible_non_distribuee = Dons::getQuantiteTotalNonDistribuee($id_matiere);
+        
+        // S'il y a des dons non distribués, retourner un message avec la liste
+        if ($quantite_disponible_non_distribuee > 0) {
+            return [
+                'success' => false,
+                'message' => 'Dons non distribués disponibles',
+                'has_undistributed_dons' => true,
+                'quantite_disponible' => $quantite_disponible_non_distribuee,
+                'dons' => $dons_non_distribues,
+                'id_matiere' => $id_matiere,
+                'id_ville' => $id_ville,
+                'montant' => $montant,
+                'frais_achat' => $frais_achat
+            ];
+        }
 
         // Récupérer le prix unitaire de la matière
         $sql_prix = "SELECT prix_unitaire FROM Matiere WHERE id_matiere = :id_matiere";
