@@ -59,40 +59,35 @@ class StatsController
         $query = "SELECT 
                     v.id_ville,
                     v.nom_ville,
-                    COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total,
-                    COALESCE(SUM(CASE 
-                        WHEN d.id_ville = v.id_ville AND EXISTS (
-                            SELECT 1 FROM Besoin b2 
-                            WHERE b2.id_ville = v.id_ville 
+                    COALESCE(
+                        (SELECT SUM(b.quantite * m.prix_unitaire)
+                         FROM Besoin b
+                         JOIN Matiere m ON b.id_matiere = m.id_matiere
+                         WHERE b.id_ville = v.id_ville),
+                        0
+                    ) as montant_total,
+                    COALESCE(
+                        (SELECT SUM(d.quantite * m.prix_unitaire)
+                         FROM Dons d
+                         JOIN Matiere m ON d.id_matiere = m.id_matiere
+                         WHERE d.id_ville = v.id_ville
+                         AND EXISTS (
+                            SELECT 1 FROM Besoin b2
+                            WHERE b2.id_ville = v.id_ville
                             AND b2.id_matiere = d.id_matiere
-                        )
-                        THEN d.quantite * m2.prix_unitaire 
-                        ELSE 0 
-                    END), 0) as montant_satisfait,
-                    COALESCE(SUM(b.quantite * m.prix_unitaire), 0) - COALESCE(SUM(CASE 
-                        WHEN d.id_ville = v.id_ville AND EXISTS (
-                            SELECT 1 FROM Besoin b2 
-                            WHERE b2.id_ville = v.id_ville 
-                            AND b2.id_matiere = d.id_matiere
-                        )
-                        THEN d.quantite * m2.prix_unitaire 
-                        ELSE 0 
-                    END), 0) as montant_restant
+                         )),
+                        0
+                    ) as montant_satisfait
                   FROM Ville v
-                  LEFT JOIN Besoin b ON v.id_ville = b.id_ville
-                  LEFT JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  LEFT JOIN Dons d ON d.id_ville > 0
-                  LEFT JOIN Matiere m2 ON d.id_matiere = m2.id_matiere
-                  GROUP BY v.id_ville, v.nom_ville
                   ORDER BY v.nom_ville";
         
         $villes = $DBH->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         
-        // Convertir en float
+        // Convertir en float et calculer le restant
         foreach ($villes as &$ville) {
             $ville['montant_total'] = (float) $ville['montant_total'];
             $ville['montant_satisfait'] = (float) $ville['montant_satisfait'];
-            $ville['montant_restant'] = (float) $ville['montant_restant'];
+            $ville['montant_restant'] = $ville['montant_total'] - $ville['montant_satisfait'];
         }
         
         return $villes;

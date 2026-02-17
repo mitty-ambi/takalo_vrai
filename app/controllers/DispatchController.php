@@ -142,8 +142,13 @@ class DispatchController
                 }
             }
 
+            // Supprimer les dons avec quantité 0 (résidus du dispatch)
+            $query_delete_zeros = "DELETE FROM Dons WHERE quantite <= 0";
+            $deleted_count = $DBH->exec($query_delete_zeros);
+            error_log('[DEBUG] Dons avec quantité 0 supprimés dans dispatcherSimple: ' . $deleted_count);
+
             $DBH->commit();
-            return ['success' => true, 'message' => $updated . ' dons dispatchés'];
+            return ['success' => true, 'message' => $updated . ' dons dispatchés, ' . $deleted_count . ' dons supprimés'];
         } catch (\Exception $e) {
             $DBH->rollBack();
             return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
