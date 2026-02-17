@@ -389,6 +389,24 @@ $router->group('', function (Router $router) use ($app) {
         }
     });
 
+    // API pour valider et dispatcher une matière spécifique
+    $router->post('/api/dispatch/valider-matiere', function () use ($app) {
+        $id_matiere = $_POST['id_matiere'] ?? null;
+
+        if (!$id_matiere) {
+            \Flight::redirect('/dispatch-par-date?error=Matière+manquante');
+            return;
+        }
+
+        $result = DispatchController::dispatcherSimple($id_matiere);
+
+        if ($result['success']) {
+            \Flight::redirect('/dispatch-par-date?success=' . urlencode($result['message']));
+        } else {
+            \Flight::redirect('/dispatch-par-date?error=' . urlencode($result['message']));
+        }
+    });
+
     // Route pour réinitialiser toutes les données
     $router->post('/api/reinitialiser', function () use ($app) {
         $result = DispatchController::reinitialiser();

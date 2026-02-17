@@ -288,6 +288,15 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Bouton pour valider cette matière -->
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <form method="POST" action="<?= $base_url ?>/api/dispatch/valider-matiere" style="flex: 1;">
+                            <input type="hidden" name="id_matiere" value="<?= $id_matiere ?>">
+                            <button type="submit" class="btn btn-valider" style="width: 100%; background: #FF6600;">✓
+                                Valider cette matière</button>
+                        </form>
+                    </div>
                 </div>
             <?php endforeach; ?>
 
