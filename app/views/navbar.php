@@ -21,6 +21,7 @@
                 <li><a href="<?= $base_url ?>/simulation" class="nav-link">🛒 Simulation</a></li>
                 <li><a href="<?= $base_url ?>/crud_dons" class="nav-link">Dons</a></li>
                 <li><a href="<?= $base_url ?>/dispatch" class="nav-link">Dispatch</a></li>
+                <li><a href="<?= $base_url ?>/recap" class="nav-link">📊 Récap</a></li>
                 <li><a href="<?= $base_url ?>/gerer_dons" class="nav-link nav-don">Donner</a></li>
             </ul>
         </div>

@@ -3,6 +3,7 @@ use app\controllers\BesoinController;
 use app\controllers\DonsController;
 use app\controllers\AchatController;
 use app\controllers\CategorieController;
+use app\controllers\StatsController;
 use app\middlewares\SecurityHeadersMiddleware;
 use flight\Engine;
 use flight\net\Router;
@@ -226,13 +227,14 @@ $router->group('', function (Router $router) use ($app) {
     $router->post('/gerer_achats/create', function () use ($app) {
         $id_besoin = $_POST['id_besoin'] ?? null;
         $quantite = $_POST['quantite'] ?? null;
+        $frais = $_POST['frais'] ?? 0;
 
         if (!$id_besoin) {
             $app->redirect('/gerer_besoins?error=Besoin requis');
             return;
         }
 
-        $result = AchatController::createFromBesoin($id_besoin, $quantite);
+        $result = AchatController::createFromBesoin($id_besoin, $quantite, $frais);
 
         if ($result['success']) {
             $app->redirect('/gerer_achats?success=' . urlencode($result['message']));
@@ -264,13 +266,14 @@ $router->group('', function (Router $router) use ($app) {
         $id_matiere = $_POST['id_matiere'] ?? null;
         $id_ville = $_POST['id_ville'] ?? null;
         $montant = $_POST['montant'] ?? null;
+        $frais = $_POST['frais'] ?? 0;
 
         if (!$id_matiere || !$id_ville || !$montant) {
             \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
             return;
         }
 
-        $result = AchatController::creerAchat($id_matiere, $id_ville, (float) $montant);
+        $result = AchatController::creerAchat($id_matiere, $id_ville, (float) $montant, (float) $frais);
         \Flight::json($result);
     });
 
@@ -279,13 +282,14 @@ $router->group('', function (Router $router) use ($app) {
         $id_matiere = $_POST['id_matiere'] ?? null;
         $id_ville = $_POST['id_ville'] ?? null;
         $montant = $_POST['montant'] ?? null;
+        $frais = $_POST['frais'] ?? 0;
 
         if (!$id_matiere || !$id_ville || !$montant) {
             \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
             return;
         }
 
-        $result = AchatController::simulerAchat($id_matiere, $id_ville, (float) $montant);
+        $result = AchatController::simulerAchat($id_matiere, $id_ville, (float) $montant, (float) $frais);
         \Flight::json($result);
     });
 
@@ -294,57 +298,56 @@ $router->group('', function (Router $router) use ($app) {
         $id_matiere = $_POST['id_matiere'] ?? null;
         $id_ville = $_POST['id_ville'] ?? null;
         $montant = $_POST['montant'] ?? null;
+        $frais = $_POST['frais'] ?? 0;
 
         if (!$id_matiere || !$id_ville || !$montant) {
             \Flight::json(['success' => false, 'message' => 'Paramètres requis']);
             return;
         }
 
-        $result = AchatController::validerAchat($id_matiere, $id_ville, (float) $montant);
+        $result = AchatController::validerAchat($id_matiere, $id_ville, (float) $montant, (float) $frais);
         \Flight::json($result);
     });
 
     // API pour stats récapitulatives globales
     $router->get('/api/stats/recap', function () use ($app) {
-        $DBH = \Flight::db();
+        $result = StatsController::getRecap();
+        \Flight::json($result);
+    });
 
-        // Besoins totaux en montant
-        $query_total = "SELECT COALESCE(SUM(b.quantite * m.prix_unitaire), 0) as montant_total
-                        FROM Besoin b
-                        JOIN Matiere m ON b.id_matiere = m.id_matiere";
-        $total = $DBH->query($query_total)->fetch(\PDO::FETCH_ASSOC);
-
-        // Besoins satisfaits en montant
-        $query_satisfait = "SELECT COALESCE(SUM(d.quantite * m.prix_unitaire), 0) as montant_satisfait
-                           FROM Dons d
-                           JOIN Matiere m ON d.id_matiere = m.id_matiere";
-        $satisfait = $DBH->query($query_satisfait)->fetch(\PDO::FETCH_ASSOC);
-
-        // Besoins restants
-        $montant_restant = $total['montant_total'] - $satisfait['montant_satisfait'];
-
-        \Flight::json([
-            'montant_total' => (float) $total['montant_total'],
-            'montant_satisfait' => (float) $satisfait['montant_satisfait'],
-            'montant_restant' => (float) $montant_restant
-        ]);
+    // API pour stats par ville
+    $router->get('/api/stats/villes', function () use ($app) {
+        $villes = StatsController::getStatsByVilles();
+        \Flight::json($villes);
     });
 
     // API pour récupérer les besoins restants (non achetés)
     $router->get('/api/besoins/remaining', function () use ($app) {
-        $DBH = \Flight::db();
-        $query = "SELECT b.*, m.nom_matiere, m.prix_unitaire, v.nom_ville
-                  FROM Besoin b
-                  JOIN Matiere m ON b.id_matiere = m.id_matiere
-                  JOIN Ville v ON b.id_ville = v.id_ville
-                  WHERE b.id_besoin NOT IN (SELECT id_besoin FROM Achats WHERE id_besoin IS NOT NULL)
-                  ORDER BY v.nom_ville, m.nom_matiere";
-        $stmt = $DBH->query($query);
-        $besoins = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $besoins = StatsController::getBesoinsRemaining();
         \Flight::json($besoins);
     });
-    $router->get('/simulation', function () use ($app) {
-        $app->render('simulation'); // affichera app/views/simulation.php
+
+    // API pour récupérer les dons non distribués
+    $router->get('/api/dons/non-distribues', function () use ($app) {
+        $dons = StatsController::getDonsNonDistribues();
+        \Flight::json($dons);
+    });
+
+    // API pour simuler le dispatch
+    $router->get('/api/dispatch/simuler', function () use ($app) {
+        $simulation = StatsController::simulerDispatch();
+        \Flight::json($simulation);
+    });
+
+    // API pour valider et dispatcher tous les dons
+    // API pour valider et dispatcher tous les dons
+    $router->post('/api/dispatch/valider', function () use ($app) {
+        $result = StatsController::validerDispatch();
+        \Flight::json($result);
+    });
+
+    $router->get('/recap', function () use ($app) {
+        $app->render('recap');
     });
 }, [SecurityHeadersMiddleware::class]);
 

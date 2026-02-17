@@ -266,8 +266,6 @@
                         let html = '';
                         data.forEach(besoin => {
                             const prix_total = besoin.prix_unitaire * besoin.quantite;
-                            const frais = 10; // À récupérer de la config
-                            const prix_avec_frais = prix_total * (1 + frais / 100);
 
                             html += `
                                 <div class="besoin-item">
@@ -287,12 +285,17 @@
                                         <strong>Prix Unitaire:</strong> <span>${new Intl.NumberFormat('fr-FR').format(besoin.prix_unitaire)} Ar</span>
                                     </div>
                                     <div class="besoin-prix">
-                                        💰 Total avec frais (${frais}%): ${new Intl.NumberFormat('fr-FR').format(prix_avec_frais)} Ar
+                                        💰 Total (sans frais): ${new Intl.NumberFormat('fr-FR').format(prix_total)} Ar
                                     </div>
                                     <div class="besoin-actions">
-                                        <form method="POST" action="${base_url}/gerer_achats/create" style="flex: 1;">
+                                        <form method="POST" action="${base_url}/gerer_achats/create" style="flex: 1; display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
                                             <input type="hidden" name="id_besoin" value="${besoin.id_besoin}">
-                                            <button type="submit" class="btn-achat">🛒 Acheter ce Besoin</button>
+                                            <div style="flex: 1; min-width: 100px;">
+                                                <label style="font-size: 12px; font-weight: 500;">Frais (%):</label>
+                                                <input type="number" name="frais" value="10" min="0" max="100" step="0.1" 
+                                                    style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                            </div>
+                                            <button type="submit" class="btn-achat">🛒 Acheter</button>
                                         </form>
                                     </div>
                                 </div>

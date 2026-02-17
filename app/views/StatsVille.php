@@ -201,7 +201,7 @@
                                     <td>
                                         <button class="btn-acheter"
                                             data-matiere="<?= htmlspecialchars($reste['nom_matiere']) ?>"
-                                            data-id-matiere="<?= $reste['id_matiere'] ?>"
+                                            data-id-matiere="<?= $reste['id_matiere'] ?>" 
                                             data-quantite-restante="<?= $reste['reste'] ?>"
                                             data-prix="<?= $reste['prix_unitaire'] ?>">
                                             🛒 Acheter
@@ -246,7 +246,11 @@
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <label>Frais d'achat: <span id="fraisAchat"></span>%</label>
+                    <label for="fraisInput">Frais d'achat (%):</label>
+                    <input type="number" id="fraisInput" name="frais" min="0" max="100" step="0.1" value="10"
+                        style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                        oninput="calculerMontant()">
+                    <small style="color: #666;">Modifiable : ex. achat de 100 avec 10% = coût 110</small>
                     <div style="background: #f0f0f0; padding: 10px; border-radius: 4px; margin-top: 5px;">
                         <strong>Total avec frais: <span id="montantTotal">0</span> Ar</strong>
                     </div>
@@ -254,6 +258,7 @@
 
                 <input type="hidden" id="id_matiere" name="id_matiere">
                 <input type="hidden" id="montantFinal" name="montant">
+                <input type="hidden" id="fraisFinal" name="frais" value="10">
                 <input type="hidden" id="id_ville" name="id_ville"
                     value="<?= isset($_GET['id_ville']) ? htmlspecialchars($_GET['id_ville']) : '' ?>">
 
@@ -269,8 +274,6 @@
     </div>
 
     <script nonce="<?= Flight::app()->get('csp_nonce') ?>">
-        var fraisConfigu = 10; // À modifier avec la config réelle
-
         document.addEventListener('DOMContentLoaded', function () {
             // Event listeners pour les onglets
             var tabButtons = document.querySelectorAll('.tab-button');
@@ -329,15 +332,14 @@
             var idMatiere = btn.getAttribute('data-id-matiere');
             var quantiteRestante = parseInt(btn.getAttribute('data-quantite-restante'));
             var prixUnitaire = parseInt(btn.getAttribute('data-prix'));
-
+            
             var valeurRestante = quantiteRestante * prixUnitaire;
 
             document.getElementById('modalMatiere').textContent = matiere;
             document.getElementById('modalValeurRestante').textContent = valeurRestante.toLocaleString('fr-FR');
             document.getElementById('id_matiere').value = idMatiere;
-            document.getElementById('fraisAchat').textContent = fraisConfigu;
             document.getElementById('pourcentage').value = 50;
-
+            
             // Stocker les valeurs pour le calcul
             window.currentPrix = prixUnitaire;
             window.currentValeurRestante = valeurRestante;
@@ -354,15 +356,18 @@
         function calculerMontant() {
             var pourcentage = parseInt(document.getElementById('pourcentage').value);
             var valeurRestante = window.currentValeurRestante || 0;
+            var frais = parseFloat(document.getElementById('fraisInput').value) || 0;
 
             document.getElementById('pourcentageValue').textContent = pourcentage;
 
             var montantAchete = (valeurRestante * pourcentage) / 100;
-            var montantAvecFrais = montantAchete * (1 + fraisConfigu / 100);
+            var montantAvecFrais = montantAchete * (1 + frais / 100);
 
             document.getElementById('montantCalcule').textContent = Math.round(montantAchete).toLocaleString('fr-FR');
             document.getElementById('montantTotal').textContent = Math.round(montantAvecFrais).toLocaleString('fr-FR');
-            document.getElementById('montantFinal').value = Math.round(montantAvecFrais);
+            // On envoie le montant de BASE (sans frais) à l'API, le backend applique les frais
+            document.getElementById('montantFinal').value = Math.round(montantAchete);
+            document.getElementById('fraisFinal').value = frais;
         }
 
         // Fermer le modal en cliquant dehors
