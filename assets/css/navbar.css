@@ -52,31 +52,22 @@
         transform: scale(1.1);
     }
 
-    .nav-logo:hover {
-        color: white;
-    }
-
-    /* Menu horizontal */
     .nav-menu {
         display: flex;
         list-style: none;
         margin: 0;
         padding: 0;
         gap: 5px;
-    }
-
-    .nav-menu li {
-        margin: 0;
+        align-items: center;
     }
 
     .nav-link {
         display: block;
-        padding: 10px 20px;
+        padding: 8px 15px;
         color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
         font-weight: 500;
-        font-size: 1rem;
-        border-radius: 30px;
+        border-radius: 5px;
         transition: all 0.3s ease;
         white-space: nowrap;
     }
@@ -84,33 +75,87 @@
     .nav-link:hover {
         background: #FF6600;
         color: white;
-        transform: translateY(-2px);
     }
 
     .nav-link.active {
         background: #FF6600;
         color: white;
-        box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
     }
 
-    /* Bouton Don spécial */
-    .nav-don {
+    /* Dropdown styles */
+    .nav-dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .dropdown-toggle i {
+        font-size: 0.8rem;
+        transition: transform 0.3s;
+    }
+
+    .nav-dropdown:hover .dropdown-toggle i {
+        transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        min-width: 200px;
+        border-radius: 5px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s;
+        list-style: none;
+        padding: 5px 0;
+        z-index: 1001;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-menu li a {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .dropdown-menu li a:hover {
+        background: #FF6600;
+        color: white;
+        padding-left: 20px;
+    }
+
+    /* Bouton Don */
+    .btn-don {
         background: #CC3300;
         color: white !important;
         font-weight: 600;
-        padding: 10px 25px !important;
+        padding: 8px 20px !important;
         margin-left: 10px;
+        border-radius: 25px;
         border: 2px solid #FF6600;
     }
 
-    .nav-don:hover {
+    .btn-don:hover {
         background: #FF6600;
         border-color: #CC3300;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
     }
 
-    /* Bouton mobile caché sur desktop */
+    /* Mobile button */
     .nav-mobile-btn {
         display: none;
         background: none;
@@ -129,7 +174,7 @@
         transition: 0.3s;
     }
 
-    /* Responsive pour mobile/tablette */
+    /* Responsive */
     @media screen and (max-width: 992px) {
         .nav-mobile-btn {
             display: block;
@@ -147,6 +192,7 @@
             gap: 10px;
             border-bottom: 3px solid #FF6600;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            align-items: stretch;
         }
 
         .nav-menu.show {
@@ -154,16 +200,45 @@
         }
 
         .nav-link {
-            text-align: center;
-            padding: 15px !important;
+            text-align: left;
+            padding: 12px 15px !important;
             width: 100%;
         }
 
-        .nav-don {
-            margin: 10px 0 0 0 !important;
+        /* Dropdown en mobile */
+        .nav-dropdown {
+            width: 100%;
         }
 
-        /* Animation du bouton mobile */
+        .dropdown-menu {
+            position: static;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            box-shadow: none;
+            background: rgba(0, 0, 0, 0.2);
+            margin: 5px 0 5px 20px;
+            min-width: auto;
+            display: none;
+        }
+
+        .nav-dropdown.show .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li a {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .dropdown-menu li a:hover {
+            background: #FF6600;
+        }
+
+        .btn-don {
+            margin: 10px 0 0 0 !important;
+            text-align: center;
+        }
+
         .nav-mobile-btn.active span:nth-child(1) {
             transform: rotate(45deg) translate(5px, 5px);
         }
@@ -177,10 +252,8 @@
         }
     }
 
-    /* Desktop seulement - horizontal garanti */
     @media screen and (min-width: 993px) {
         .nav-menu {
             display: flex !important;
-            flex-direction: row;
         }
     }
