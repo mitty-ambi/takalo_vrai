@@ -24,8 +24,6 @@ ini_set('display_startup_errors', 1);
 
 $router->group('', function (Router $router) use ($app) {
     $router->get('/', function () use ($app) {
-        // optional search filter by city name
-        $a = 0;
         $search = trim($_GET['nom_ville'] ?? '');
         $listeVille = Ville::getAll();
         if ($search !== '') {
