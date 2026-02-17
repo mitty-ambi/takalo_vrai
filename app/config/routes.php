@@ -335,7 +335,7 @@ $router->group('', function (Router $router) use ($app) {
         $stats = Stats::getRecapGlobal();
         \Flight::json($stats);
     });
-    
+
     // API pour récupérer les besoins restants (non achetés)
     $router->get('/api/besoins/remaining', function () use ($app) {
         $besoins = Besoin::getBesoinsRestants();
@@ -383,7 +383,7 @@ $router->group('', function (Router $router) use ($app) {
         // Récupérer les données POST
         $repartition_json = $_POST['repartition'] ?? '[]';
         $repartition = json_decode($repartition_json, true);
-        
+
         $result = DispatchController::validerDispatch($repartition);
 
         if ($result['success']) {
