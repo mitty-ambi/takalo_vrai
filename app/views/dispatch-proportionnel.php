@@ -251,21 +251,54 @@
                                 <tr>
                                     <th>Ville</th>
                                     <th>Quantité demandée</th>
-                                    <th>Ratio (besoin/nbr_dons)</th>
-                                    <th>Attribution (floor)</th>
+                                    <th>Formule: (demande × total) / (somme demandes)</th>
+                                    <th>Attribution</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($matiere_data['besoins'] as $besoin):
-                                    $ratio = $besoin['quantite'] / $nb_dons;
-                                    $attribution = floor($ratio);
+                                <?php
+                                $somme_demandes = 0;
+                                foreach ($matiere_data['besoins'] as $besoin) {
+                                    $somme_demandes += $besoin['quantite'];
+                                }
+
+                                $distributions = [];
+                                $total_attribue = 0;
+                                foreach ($matiere_data['besoins'] as $besoin) {
+                                    $part_exacte = ($besoin['quantite'] * $total_dons) / $somme_demandes;
+                                    $part_entiere = floor($part_exacte);
+                                    $decimale = $part_exacte - $part_entiere;
+
+                                    $distributions[] = [
+                                        'besoin' => $besoin,
+                                        'part_exacte' => $part_exacte,
+                                        'part_entiere' => $part_entiere,
+                                        'decimale' => $decimale
+                                    ];
+                                    $total_attribue += $part_entiere;
+                                }
+
+                                usort($distributions, function ($a, $b) {
+                                    return $b['decimale'] <=> $a['decimale'];
+                                });
+
+                                $reste = $total_dons - $total_attribue;
+                                for ($i = 0; $i < $reste && $i < count($distributions); $i++) {
+                                    if ($distributions[$i]['decimale'] > 0) {
+                                        $distributions[$i]['part_entiere']++;
+                                    }
+                                }
+
+                                foreach ($distributions as $dist):
+                                    $besoin = $dist['besoin'];
+                                    $attribution = $dist['part_entiere'];
                                     ?>
                                     <tr data-id-besoin="<?= $besoin['id_besoin'] ?>" data-quantite="<?= $attribution ?>"
                                         data-id-ville="<?= $besoin['id_ville'] ?>">
                                         <td class="ville"><?= htmlspecialchars($besoin['nom_ville']) ?></td>
                                         <td class="quantite"><?= $besoin['quantite'] ?> unités</td>
-                                        <td class="date"><?= $besoin['quantite'] ?>/<?= $nb_dons ?> =
-                                            <?= number_format($ratio, 3) ?>
+                                        <td class="date">(<?= $besoin['quantite'] ?> × <?= $total_dons ?>) /
+                                            <?= $somme_demandes ?> = <?= number_format($dist['part_exacte'], 2) ?>
                                         </td>
                                         <td class="attribution"><?= $attribution ?> unités</td>
                                     </tr>
@@ -284,17 +317,12 @@
                     </div>
                 </div>
             <?php endforeach; ?>
-
             <div class="btn-group">
                 <button type="button" class="btn btn-retour" onclick="history.back()">← Retour</button>
                 <button type="submit" class="btn btn-valider">✓ Valider le Dispatch</button>
             </div>
         </form>
     </div>
-
-    <script>
-        // Pas de JavaScript complexe - simple POST
-    </script>
 </body>
 
 </html>
